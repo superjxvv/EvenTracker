@@ -23,7 +23,10 @@
         <activity android:name=".addEvent" />
         <activity android:name=".EventsToday" />
         <activity android:name=".EditEvent" />
-        <activity android:name=".EmailFeedBack"></activity>
+        <activity android:name=".EmailFeedBack" />
+        <activity android:name=".GroupList" />
+        <activity android:name=".groupCalendar" />
+        <activity android:name=".addGroup"></activity>
     </application>
 
 </manifest>
