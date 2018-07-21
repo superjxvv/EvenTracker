@@ -94,7 +94,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 finish();
                 Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
                 startActivity(intent);
+            }else {
+                Toast.makeText(LoginActivity.this, " invalid email or password", Toast.LENGTH_LONG).show();
             }
+
         }
     });
 }

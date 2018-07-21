@@ -29,7 +29,9 @@
         <activity android:name=".addGroup" />
         <activity android:name=".FindUsers" />
         <activity android:name=".UserInfo" />
-        <activity android:name=".RequestList"></activity>
+        <activity android:name=".RequestList" />
+        <activity android:name=".EventsTodayGroup" />
+        <activity android:name=".groupDetails"></activity>
     </application>
 
 </manifest>

@@ -222,7 +222,8 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
             int numDays = (end_Date - start_Date)+1;
             for(int i=0; i<numDays; i++) {
                 int key = getKey(start_Date, i);
-                eventDB = FirebaseDatabase.getInstance().getReference().child("Users").child(email).child(userId).child("Events").child(Integer.toString(key));
+                eventDB = FirebaseDatabase.getInstance().getReference().child("Users").
+                        child(encodeUserEmail(email)).child(userId).child("Events").child(Integer.toString(key));
                 String eventId = eventDB.push().getKey();
                 String event_name = eventName.getText().toString().trim();
                 String start_time = startTime.getText().toString().trim();
@@ -265,6 +266,12 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
         return year*10000 + month*100 + day;
     }
 
+    public String encodeUserEmail(String userEmail) {
+        return userEmail.replace(".", ",");
+    }
+    public String decodeUserEmail(String userEmail) {
+        return userEmail.replace(",", ".");
+    }
     /*private String getEndTime (int hourOfDay, int minute){
         String time;
         if(hourOfDay <9 && minute <10){

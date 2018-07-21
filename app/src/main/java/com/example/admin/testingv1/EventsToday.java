@@ -56,7 +56,7 @@ public class EventsToday extends AppCompatActivity implements View.OnClickListen
         int key = year*10000 +month *100 +day;
         FirebaseUser user = firebaseAuth.getCurrentUser();
         String email = user.getEmail();
-        Query query = mRef.child("Users").child(email).child(userID).child("Events").child(Integer.toString(key));
+        Query query = mRef.child("Users").child(encodeUserEmail(email)).child(userID).child("Events").child(Integer.toString(key));
 
         theDate.setText(date);
 
@@ -115,5 +115,12 @@ public class EventsToday extends AppCompatActivity implements View.OnClickListen
             intent.putExtra("date", date);
             startActivity(intent);
         }
+    }
+
+    public String encodeUserEmail(String userEmail) {
+        return userEmail.replace(".", ",");
+    }
+    public String decodeUserEmail(String userEmail) {
+        return userEmail.replace(",", ".");
     }
 }

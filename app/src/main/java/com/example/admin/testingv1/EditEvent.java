@@ -227,7 +227,7 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
                 int key = getKey(start_Date, i);
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 String email = user.getEmail();
-                eventDB = FirebaseDatabase.getInstance().getReference().child("Users").child(email).child(userId).child("Events").child(Integer.toString(key));
+                eventDB = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child(userId).child("Events").child(Integer.toString(key));
                 String eventId = event.getEventId();
                 String event_name = eventName.getText().toString().trim();
                 String start_time = startTime.getText().toString().trim();
@@ -290,12 +290,13 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
         end_Date = year *10000 + month *100 + day;
 
         String eventId = event.getEventId();
+        String email = firebaseAuth.getCurrentUser().getEmail();
 
         int numDays = getNumDays(start_Date, end_Date);
         for (int i = 0; i < numDays; i++) {
             int key = start_Date + i;
-            FirebaseDatabase.getInstance().getReference().child("Users").child(userId).child("Events")
-                    .child(Integer.toString(key)).child(eventId).removeValue();
+            FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email))
+                    .child(userId).child("Events").child(Integer.toString(key)).child(eventId).removeValue();
         }
     }
 
@@ -332,5 +333,12 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
         int hour = Integer.parseInt(info[0]);
         int minute = Integer.parseInt(info [1]);
         return hour*100 + minute;
+    }
+
+    public String encodeUserEmail(String userEmail) {
+        return userEmail.replace(".", ",");
+    }
+    public String decodeUserEmail(String userEmail) {
+        return userEmail.replace(",", ".");
     }
 }

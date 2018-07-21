@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             myRef = FirebaseDatabase.getInstance().getReference("Users");
                             String userId = firebaseAuth.getCurrentUser().getUid();
                             User user = new User(userId);
-                            myRef.child(email).child(userId).setValue(user);
+                            myRef.child(encodeUserEmail(email)).child(userId).setValue(user);
                             startActivity(intent);
                         }else{
                             Toast.makeText(MainActivity.this, "Could not register, please try again.", Toast.LENGTH_SHORT).show();
@@ -107,5 +107,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //will open login
             startActivity(new Intent(this, LoginActivity.class));
         }
+    }
+
+    public String encodeUserEmail(String userEmail) {
+        return userEmail.replace(".", ",");
+    }
+    public String decodeUserEmail(String userEmail) {
+        return userEmail.replace(",", ".");
     }
 }
