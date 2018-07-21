@@ -96,4 +96,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
     }
+
+    @Override
+    public void onClick(View view) {
+        if(view == buttonRegister){
+            registerUser();
+        }
+
+        if(view == textViewLogin){
+            //will open login
+            startActivity(new Intent(this, LoginActivity.class));
+        }
+    }
 }
