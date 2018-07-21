@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             myRef = FirebaseDatabase.getInstance().getReference("Users");
                             String userId = firebaseAuth.getCurrentUser().getUid();
                             User user = new User(userId);
-                            myRef.child(userId).setValue(user);
+                            myRef.child(email).child(userId).setValue(user);
                             startActivity(intent);
                         }else{
                             Toast.makeText(MainActivity.this, "Could not register, please try again.", Toast.LENGTH_SHORT).show();
@@ -95,17 +95,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         progressDialog.dismiss();
                     }
                 });
-    }
-
-    @Override
-    public void onClick(View view) {
-        if(view == buttonRegister){
-            registerUser();
-        }
-
-        if(view == textViewLogin){
-            //will open login
-            startActivity(new Intent(this, LoginActivity.class));
-        }
     }
 }

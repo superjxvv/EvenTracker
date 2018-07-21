@@ -20,6 +20,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -217,10 +218,11 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
         if(view == addEventBtn) {
             Toast.makeText(addEvent.this, "Added Successfully!", Toast.LENGTH_SHORT).show();
             String userId = firebaseAuth.getCurrentUser().getUid();
+            String email = firebaseAuth.getCurrentUser().getEmail();
             int numDays = (end_Date - start_Date)+1;
             for(int i=0; i<numDays; i++) {
                 int key = getKey(start_Date, i);
-                eventDB = FirebaseDatabase.getInstance().getReference().child("Users").child(userId).child("Events").child(Integer.toString(key));
+                eventDB = FirebaseDatabase.getInstance().getReference().child("Users").child(email).child(userId).child("Events").child(Integer.toString(key));
                 String eventId = eventDB.push().getKey();
                 String event_name = eventName.getText().toString().trim();
                 String start_time = startTime.getText().toString().trim();

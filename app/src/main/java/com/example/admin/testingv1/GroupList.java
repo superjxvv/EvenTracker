@@ -30,7 +30,7 @@ public class GroupList extends AppCompatActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_list);
 
-        addGroupBtn = (Button) findViewById(R.id.addGroup);
+        addGroupBtn = (Button) findViewById(R.id.backBtn);
         firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getCurrentUser().getUid();
         myRecyclerView = (RecyclerView) findViewById(R.id.groupsRecyclerView);

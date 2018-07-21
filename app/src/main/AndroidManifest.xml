@@ -26,7 +26,10 @@
         <activity android:name=".EmailFeedBack" />
         <activity android:name=".GroupList" />
         <activity android:name=".groupCalendar" />
-        <activity android:name=".addGroup"></activity>
+        <activity android:name=".addGroup" />
+        <activity android:name=".FindUsers" />
+        <activity android:name=".UserInfo" />
+        <activity android:name=".RequestList"></activity>
     </application>
 
 </manifest>

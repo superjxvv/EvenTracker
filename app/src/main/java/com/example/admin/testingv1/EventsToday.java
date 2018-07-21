@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -53,7 +54,9 @@ public class EventsToday extends AppCompatActivity implements View.OnClickListen
 
         mRef = FirebaseDatabase.getInstance().getReference();
         int key = year*10000 +month *100 +day;
-        Query query = mRef.child("Users").child(userID).child("Events").child(Integer.toString(key));
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        String email = user.getEmail();
+        Query query = mRef.child("Users").child(email).child(userID).child("Events").child(Integer.toString(key));
 
         theDate.setText(date);
 
