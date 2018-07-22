@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id = "@+id/Logout"
-        android:title="Logout"
+        android:id = "@+id/findUsers"
+        android:title="Find users"
         app:showAsAction="always"
         />
 </menu>

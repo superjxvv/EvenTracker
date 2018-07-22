@@ -2,7 +2,6 @@ package com.example.admin.testingv1;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 public class GroupViewHolder extends RecyclerView.ViewHolder  {
@@ -14,7 +13,7 @@ public class GroupViewHolder extends RecyclerView.ViewHolder  {
     }
 
     public void setGroupName (String groupName_) {
-        TextView groupName = (TextView) mView.findViewById(R.id.groupName);
+        TextView groupName = (TextView) mView.findViewById(R.id.name);
         groupName.setText(groupName_);
     }
 }

@@ -7,7 +7,7 @@
     tools:context=".groupCalendar">
 
     <TextView
-        android:id="@+id/groupName"
+        android:id="@+id/name"
         android:layout_width="158dp"
         android:layout_height="30dp"
         android:layout_marginBottom="8dp"
@@ -34,6 +34,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/groupName"
+        app:layout_constraintTop_toBottomOf="@+id/name"
         app:layout_constraintVertical_bias="0.288" />
 </android.support.constraint.ConstraintLayout>

@@ -33,7 +33,7 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-database:4.0.1'
     implementation "android.arch.core:runtime:1.1.1"
     implementation "android.arch.core:common:1.1.1"
-    //CardView
     implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
 }
 apply plugin: 'com.google.gms.google-services'

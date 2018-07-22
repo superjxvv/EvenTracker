@@ -26,12 +26,18 @@
         <activity android:name=".EmailFeedBack" />
         <activity android:name=".GroupList" />
         <activity android:name=".groupCalendar" />
-        <activity android:name=".addGroup" />
+        <activity
+            android:name=".addGroup"
+            android:parentActivityName=".ProfileActivity" />
         <activity android:name=".FindUsers" />
         <activity android:name=".UserInfo" />
         <activity android:name=".RequestList" />
         <activity android:name=".EventsTodayGroup" />
-        <activity android:name=".groupDetails"></activity>
+        <activity android:name=".groupDetails" />
+        <activity android:name=".MemberViewHolder" />
+        <activity android:name=".FriendList" />
+        <activity android:name=".setName" />
+        <activity android:name=".checkMemberViewHolder"></activity>
     </application>
 
 </manifest>

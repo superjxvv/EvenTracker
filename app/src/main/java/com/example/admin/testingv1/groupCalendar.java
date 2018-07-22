@@ -10,8 +10,6 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.Calendar;
-
 public class groupCalendar extends AppCompatActivity implements View.OnClickListener{
     private CalendarView calendarView;
     private TextView groupName;
@@ -25,7 +23,7 @@ public class groupCalendar extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_group_calendar);
 
         calendarView = (CalendarView) findViewById(R.id.groupCalenderView);
-        groupName = (TextView) findViewById(R.id.groupName);
+        groupName = (TextView) findViewById(R.id.name);
         firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getCurrentUser().getUid();
         Intent incomingIntent = getIntent();
@@ -47,7 +45,9 @@ public class groupCalendar extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View view) {
         if(view == groupName) {
-            startActivity(new Intent(this, groupDetails.class));
+            Intent intent = new Intent(this, groupDetails.class);
+            intent.putExtra("group", group);
+            startActivity(intent);
         }
     }
 }
