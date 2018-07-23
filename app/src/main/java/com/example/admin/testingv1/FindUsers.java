@@ -38,6 +38,7 @@ public class FindUsers extends AppCompatActivity implements View.OnClickListener
         enterBtn = (Button) findViewById(R.id.enterBtn);
         searchTab = (EditText) findViewById(R.id.searchTab);
         userFound = (TextView) findViewById(R.id.userFound);
+        userFound.setText("");
 
         enterBtn.setOnClickListener(this);
         userFound.setOnClickListener(this);
@@ -47,14 +48,14 @@ public class FindUsers extends AppCompatActivity implements View.OnClickListener
     @Override
     public void onClick(View view) {
         if (view == enterBtn) {
-            email = searchTab.getText().toString().trim();
+            email = encodeUserEmail(searchTab.getText().toString().trim());
             myRef = FirebaseDatabase.getInstance().getReference().child("Users");
             myRef.child(email).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.getValue() != null) {
                         //user exists
-                        userFound.setText(email);
+                        userFound.setText(decodeUserEmail(email));
                         Toast.makeText(FindUsers.this, "User found!", Toast.LENGTH_SHORT).show();
                     } else {
                         //user does not exist
@@ -77,15 +78,24 @@ public class FindUsers extends AppCompatActivity implements View.OnClickListener
 
         if (view == userFound) {
             FirebaseUser user = firebaseAuth.getCurrentUser();
-            if (userFound.getText() != null) {
+            if (!(userFound.getText().equals(""))) {
                 if (userFound.getText().equals(user.getEmail())) {
-                    startActivity(new Intent(this, ProfileActivity.class));
+                    startActivity(new Intent(FindUsers.this, ProfileActivity.class));
                 } else {
-                    Intent intent = new Intent(this, UserInfo.class);
-                    intent.putExtra("Email", email);
+                    Intent intent = new Intent(FindUsers.this, UserInfo.class);
+                    intent.putExtra("Email", decodeUserEmail(email));
                     startActivity(intent);
                 }
+            } else {
+                Toast.makeText(FindUsers.this, "No such user.", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public String encodeUserEmail(String userEmail) {
+        return userEmail.replace(".", ",");
+    }
+    public String decodeUserEmail(String userEmail) {
+        return userEmail.replace(",", ".");
     }
 }

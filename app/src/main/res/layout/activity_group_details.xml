@@ -7,7 +7,7 @@
     tools:context=".groupDetails">
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/Description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"

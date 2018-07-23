@@ -19,6 +19,7 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private TextView textViewUserEmail;
     private CalendarView calendarView;
+    private String userEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +33,16 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(new Intent(this, LoginActivity.class));
         }
 
+        Intent incomingIntent = getIntent();
+        userEmail = incomingIntent.getStringExtra("userEmail");
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
         textViewUserEmail = (TextView) findViewById(R.id.textViewUserEmail);
-        textViewUserEmail.setText("Welcome " + user.getEmail());
+        if(userEmail!=null){
+            textViewUserEmail.setText(userEmail+"'s Calendar.");
+        } else {
+            textViewUserEmail.setText("Welcome " + user.getEmail());
+        }
         calendarView = (CalendarView) findViewById(R.id.calendarView);
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -43,6 +50,7 @@ public class ProfileActivity extends AppCompatActivity {
                 String date = dayOfMonth + "/" + (month + 1) + "/" + year;
                 Intent intent = new Intent(ProfileActivity.this, EventsToday.class);
                 intent.putExtra("date", date);
+                intent.putExtra("userEmail", userEmail);
                 startActivity(intent);
             }
         });

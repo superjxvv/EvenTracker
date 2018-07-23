@@ -13,7 +13,7 @@ public class GroupViewHolder extends RecyclerView.ViewHolder  {
     }
 
     public void setGroupName (String groupName_) {
-        TextView groupName = (TextView) mView.findViewById(R.id.name);
+        TextView groupName = (TextView) mView.findViewById(R.id.Description);
         groupName.setText(groupName_);
     }
 }

@@ -37,7 +37,8 @@
         <activity android:name=".MemberViewHolder" />
         <activity android:name=".FriendList" />
         <activity android:name=".setName" />
-        <activity android:name=".checkMemberViewHolder"></activity>
+        <activity android:name=".checkMemberViewHolder" />
+        <activity android:name=".Notifications"></activity>
     </application>
 
 </manifest>
