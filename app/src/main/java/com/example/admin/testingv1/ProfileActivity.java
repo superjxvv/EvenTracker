@@ -77,10 +77,12 @@ public class ProfileActivity extends AppCompatActivity {
             Intent intent = new Intent(this, GroupList.class);
             startActivity(intent);
         }else if(item.getItemId()==R.id.notifications) {
-            Intent intent = new Intent(this, RequestList.class);
+            Intent intent = new Intent(this, Notifications.class);
             startActivity(intent);
         }else if(item.getItemId()==R.id.feedback) {
             startActivity(new Intent(this, EmailFeedBack.class));
+        }else if(item.getItemId()==R.id.requests) {
+            startActivity(new Intent(this, RequestList.class));
         }
         return super.onOptionsItemSelected(item);
     }

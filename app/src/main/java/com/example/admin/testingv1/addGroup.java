@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -37,7 +38,7 @@ public class addGroup extends AppCompatActivity {
         setContentView(R.layout.activity_add_group);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        checkedMembers = new ArrayList<String>();
         next = (FloatingActionButton) findViewById(R.id.next);
         firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getCurrentUser().getUid();
@@ -76,9 +77,13 @@ public class addGroup extends AppCompatActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(addGroup.this, setName.class);
-                intent.putExtra("checkedMembers", checkedMembers);
-                startActivity(intent);
+                if(checkedMembers.size() < 1) {
+                    Toast.makeText(addGroup.this, "select at least 1 participant", Toast.LENGTH_SHORT).show();
+                }else {
+                    Intent intent = new Intent(addGroup.this, setName.class);
+                    intent.putExtra("checkedMembers", checkedMembers);
+                    startActivity(intent);
+                }
             }
         });
     }

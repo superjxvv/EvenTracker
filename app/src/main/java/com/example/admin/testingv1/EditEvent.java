@@ -227,7 +227,7 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
                 int key = getKey(start_Date, i);
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 String email = user.getEmail();
-                eventDB = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child(userId).child("Events").child(Integer.toString(key));
+                eventDB = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("Events").child(Integer.toString(key));
                 String eventId = event.getEventId();
                 String event_name = eventName.getText().toString().trim();
                 String start_time = startTime.getText().toString().trim();
@@ -296,7 +296,7 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
         for (int i = 0; i < numDays; i++) {
             int key = start_Date + i;
             FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email))
-                    .child(userId).child("Events").child(Integer.toString(key)).child(eventId).removeValue();
+                    .child("Events").child(Integer.toString(key)).child(eventId).removeValue();
         }
     }
 

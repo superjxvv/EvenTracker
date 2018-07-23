@@ -33,8 +33,10 @@ public class FindUsers extends AppCompatActivity implements View.OnClickListener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_users);
-        firebaseAuth = FirebaseAuth.getInstance();
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        firebaseAuth = FirebaseAuth.getInstance();
         enterBtn = (Button) findViewById(R.id.enterBtn);
         searchTab = (EditText) findViewById(R.id.searchTab);
         userFound = (TextView) findViewById(R.id.userFound);

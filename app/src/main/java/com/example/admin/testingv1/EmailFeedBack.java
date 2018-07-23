@@ -16,6 +16,9 @@ public class EmailFeedBack extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_email_feed_back);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         mEditTextSubject = findViewById(R.id.edit_text_subject);
         mEditTextMessage = findViewById(R.id.edit_text_message);
 

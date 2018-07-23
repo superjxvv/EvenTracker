@@ -17,6 +17,11 @@
         app:showAsAction="never"
         />
     <item
+        android:id = "@+id/requests"
+        android:title="Requests"
+        app:showAsAction="never"
+        />
+    <item
         android:id = "@+id/notifications"
         android:title="Notifications"
         app:showAsAction="never"

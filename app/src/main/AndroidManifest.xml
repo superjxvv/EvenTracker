@@ -21,24 +21,22 @@
         <activity android:name=".ProfileActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".addEvent" />
-        <activity android:name=".EventsToday" />
+        <activity android:name=".EventsToday" android:parentActivityName=".ProfileActivity"></activity>
         <activity android:name=".EditEvent" />
-        <activity android:name=".EmailFeedBack" />
-        <activity android:name=".GroupList" />
+        <activity android:name=".EmailFeedBack" android:parentActivityName=".ProfileActivity"></activity>
+        <activity android:name=".GroupList" android:parentActivityName=".ProfileActivity"></activity>
         <activity android:name=".groupCalendar" />
-        <activity
-            android:name=".addGroup"
-            android:parentActivityName=".ProfileActivity" />
-        <activity android:name=".FindUsers" />
-        <activity android:name=".UserInfo" />
-        <activity android:name=".RequestList" />
+        <activity android:name=".addGroup" android:parentActivityName=".GroupList"></activity>
+        <activity android:name=".FindUsers" android:parentActivityName=".FriendList"></activity>
+        <activity android:name=".UserInfo" android:parentActivityName=".FindUsers"></activity>
+        <activity android:name=".RequestList" android:parentActivityName=".ProfileActivity"></activity>
         <activity android:name=".EventsTodayGroup" />
         <activity android:name=".groupDetails" />
         <activity android:name=".MemberViewHolder" />
-        <activity android:name=".FriendList" />
+        <activity android:name=".FriendList" android:parentActivityName=".ProfileActivity"></activity>
         <activity android:name=".setName" />
         <activity android:name=".checkMemberViewHolder" />
-        <activity android:name=".Notifications"></activity>
+        <activity android:name=".Notifications" android:parentActivityName=".ProfileActivity"></activity>
     </application>
 
 </manifest>

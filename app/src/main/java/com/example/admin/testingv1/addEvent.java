@@ -223,7 +223,7 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
             for(int i=0; i<numDays; i++) {
                 int key = getKey(start_Date, i);
                 eventDB = FirebaseDatabase.getInstance().getReference().child("Users").
-                        child(encodeUserEmail(email)).child(userId).child("Events").child(Integer.toString(key));
+                        child(encodeUserEmail(email)).child("Events").child(Integer.toString(key));
                 String eventId = eventDB.push().getKey();
                 String event_name = eventName.getText().toString().trim();
                 String start_time = startTime.getText().toString().trim();

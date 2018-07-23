@@ -17,8 +17,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-public class RequestList extends AppCompatActivity implements View.OnClickListener {
-    private Button backBtn;
+public class RequestList extends AppCompatActivity {
+
     private RecyclerView myRecyclerView;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mRef;
@@ -32,14 +32,14 @@ public class RequestList extends AppCompatActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_list);
 
-        backBtn = (Button) findViewById(R.id.backBtn);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getCurrentUser().getUid();
         userEmail = firebaseAuth.getCurrentUser().getEmail();
         myRecyclerView = (RecyclerView) findViewById(R.id.requestRecyclerView);
         myRecyclerView.setHasFixedSize(true);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        backBtn.setOnClickListener(this);
 
         mRef = FirebaseDatabase.getInstance().getReference();
         final Query query = mRef.child("Users").child(encodeUserEmail(userEmail)).child("Request");
@@ -94,12 +94,6 @@ public class RequestList extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    public void onClick(View view) {
-        if (view == backBtn) {
-            Intent intent = new Intent(RequestList.this, ProfileActivity.class);
-            startActivity(intent);
-        }
-    }
 
     public String encodeUserEmail(String userEmail) {
         return userEmail.replace(".", ",");

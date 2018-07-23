@@ -31,6 +31,8 @@ public class GroupList extends AppCompatActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_list);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         addGroupBtn = (Button) findViewById(R.id.backBtn);
         firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getCurrentUser().getUid();

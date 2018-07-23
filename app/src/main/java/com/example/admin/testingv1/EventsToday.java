@@ -23,7 +23,6 @@ import com.google.firebase.database.Query;
 public class EventsToday extends AppCompatActivity implements View.OnClickListener{
 
     private TextView theDate;
-    private Button backToProfile;
     private Button addEvent;
     private FirebaseAuth firebaseAuth;
     private String date;
@@ -38,9 +37,10 @@ public class EventsToday extends AppCompatActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_events_today);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         theDate = (TextView) findViewById(R.id.theDate);
         addEvent = (Button) findViewById(R.id.addEvent);
-        backToProfile = (Button) findViewById(R.id.backToProfile);
         firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getCurrentUser().getUid();
         myRecyclerView = (RecyclerView) findViewById(R.id.myRecyclerView);
@@ -58,7 +58,7 @@ public class EventsToday extends AppCompatActivity implements View.OnClickListen
         mRef = FirebaseDatabase.getInstance().getReference();
         int key = year*10000 +month *100 +day;
         FirebaseUser user = firebaseAuth.getCurrentUser();
-        if(userEmail!=null) {
+        if(userEmail==null) {
             String email = user.getEmail();
             query = mRef.child("Users").child(encodeUserEmail(email)).child("Events").child(Integer.toString(key));
         } else {
@@ -66,7 +66,6 @@ public class EventsToday extends AppCompatActivity implements View.OnClickListen
         }
         theDate.setText(date);
 
-        backToProfile.setOnClickListener(this);
         addEvent.setOnClickListener(this);
         FirebaseRecyclerOptions<Event> firebaseRecyclerOptions = new FirebaseRecyclerOptions.Builder<Event>().setQuery(query, Event.class).build();
         recyclerAdapter = new FirebaseRecyclerAdapter<Event, EventViewHolder>
@@ -111,11 +110,6 @@ public class EventsToday extends AppCompatActivity implements View.OnClickListen
     }
 
     public void onClick(View view) {
-        if (view == backToProfile) {
-            //will open login
-            Intent intent = new Intent(EventsToday.this, ProfileActivity.class);
-            startActivity(intent);
-        }
         if (view == addEvent) {
             Intent intent = new Intent(EventsToday.this, addEvent.class);
             intent.putExtra("date", date);
