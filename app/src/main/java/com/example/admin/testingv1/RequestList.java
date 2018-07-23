@@ -42,7 +42,7 @@ public class RequestList extends AppCompatActivity implements View.OnClickListen
         backBtn.setOnClickListener(this);
 
         mRef = FirebaseDatabase.getInstance().getReference();
-        final Query query = mRef.child("Users").child(userEmail).child("Request");
+        final Query query = mRef.child("Users").child(encodeUserEmail(userEmail)).child("Request");
         FirebaseRecyclerOptions<Request> firebaseRecyclerOptions = new FirebaseRecyclerOptions.Builder<Request>().setQuery(query, Request.class).build();
         recyclerAdapter = new FirebaseRecyclerAdapter<Request, RequestViewHolder>
                 (firebaseRecyclerOptions) {
@@ -61,12 +61,11 @@ public class RequestList extends AppCompatActivity implements View.OnClickListen
                         String requestType = model.getRequestType();
                         String requester = model.getRequester();
                         if(requestType.equals("friendRequest")){
-                            mRef.child("Users").child(userEmail).child("Friends").child(requester);
-                            mRef.child("Users").child(requester).child("Friends").child(userEmail);
+                            mRef.child("Users").child(encodeUserEmail(userEmail)).child("Friends").child(encodeUserEmail(requester));
+                            mRef.child("Users").child(encodeUserEmail(requester)).child("Friends").child(encodeUserEmail(userEmail));
                         } else {
-
-                            mRef.child("Users").child(requester).child("AcceptedRequests").setValue(userEmail);
-                            mRef.child("Users").child(userEmail).child("Request").child(requestID).removeValue();
+                            mRef.child("Users").child(encodeUserEmail(requester)).child("AcceptedRequests").child(encodeUserEmail(userEmail));
+                            mRef.child("Users").child(encodeUserEmail(userEmail)).child("Request").child(requestID).removeValue();
                         }
                     }
                 });
@@ -74,7 +73,7 @@ public class RequestList extends AppCompatActivity implements View.OnClickListen
                     @Override
                     public void onClick(View view) {
                         requestID = model.getRequestID();
-                        mRef.child("Users").child(userEmail).child("Request").child(requestID).removeValue();
+                        mRef.child("Users").child(encodeUserEmail(userEmail)).child("Request").child(requestID).removeValue();
                     }
                 });
             }
@@ -100,5 +99,12 @@ public class RequestList extends AppCompatActivity implements View.OnClickListen
             Intent intent = new Intent(RequestList.this, ProfileActivity.class);
             startActivity(intent);
         }
+    }
+
+    public String encodeUserEmail(String userEmail) {
+        return userEmail.replace(".", ",");
+    }
+    public String decodeUserEmail(String userEmail) {
+        return userEmail.replace(",", ".");
     }
 }

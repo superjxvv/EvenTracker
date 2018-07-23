@@ -30,6 +30,8 @@ public class EventsToday extends AppCompatActivity implements View.OnClickListen
     private RecyclerView myRecyclerView;
     private DatabaseReference mRef;
     private String userID;
+    private String userEmail;
+    private Query query;
     private FirebaseRecyclerAdapter <Event, EventViewHolder> recyclerAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public class EventsToday extends AppCompatActivity implements View.OnClickListen
 
         Intent incomingIntent = getIntent();
         date = incomingIntent.getStringExtra("date");
+        userEmail = incomingIntent.getStringExtra("userEmail");
         String [] info = date.split("/");
         int day = Integer.parseInt(info[0]);
         int month = Integer.parseInt(info [1]);
@@ -55,9 +58,12 @@ public class EventsToday extends AppCompatActivity implements View.OnClickListen
         mRef = FirebaseDatabase.getInstance().getReference();
         int key = year*10000 +month *100 +day;
         FirebaseUser user = firebaseAuth.getCurrentUser();
-        String email = user.getEmail();
-        Query query = mRef.child("Users").child(encodeUserEmail(email)).child(userID).child("Events").child(Integer.toString(key));
-
+        if(userEmail!=null) {
+            String email = user.getEmail();
+            query = mRef.child("Users").child(encodeUserEmail(email)).child("Events").child(Integer.toString(key));
+        } else {
+            query = mRef.child("Users").child(encodeUserEmail(userEmail)).child("Events").child(Integer.toString(key));
+        }
         theDate.setText(date);
 
         backToProfile.setOnClickListener(this);

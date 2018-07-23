@@ -13,7 +13,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 
 public class groupDetails extends AppCompatActivity {
 
@@ -32,7 +31,7 @@ public class groupDetails extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_details);
 
-        groupName = (TextView) findViewById(R.id.name);
+        groupName = (TextView) findViewById(R.id.Description);
         members = (RecyclerView) findViewById(R.id.members);
         leaveGroup = (Button) findViewById(R.id.leaveGroup);
         backToGroupCalendar = (Button) findViewById(R.id.backToGroupCalendar);
