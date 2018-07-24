@@ -32,6 +32,7 @@ public class EventsTodayGroup extends AppCompatActivity implements View.OnClickL
     private ArrayList<String> members;
     private int numMembers;
     private Group group;
+    private String groupName;
     private Query query;
     private FirebaseRecyclerAdapter<Event, GroupEventViewHolder> recyclerAdapter;
     @Override
@@ -52,7 +53,9 @@ public class EventsTodayGroup extends AppCompatActivity implements View.OnClickL
         date = incomingIntent.getStringExtra("date");
         group = incomingIntent.getParcelableExtra("group");
         members = group.getMembers();
+        groupName = group.getGroupID();
         numMembers = members.size();
+
         String [] info = date.split("/");
         int day = Integer.parseInt(info[0]);
         int month = Integer.parseInt(info [1]);
@@ -64,13 +67,9 @@ public class EventsTodayGroup extends AppCompatActivity implements View.OnClickL
         int key = year*10000 +month *100 +day;
 
         addEvent.setOnClickListener(this);
-
-        while(numMembers > 0){
-            userEmail = members.get(numMembers-1);
-            query = mRef.child("Users").child(encodeUserEmail(userEmail)).child("Events").child(Integer.toString(key));
-            FirebaseRecyclerOptions<Event> firebaseRecyclerOptions = new FirebaseRecyclerOptions.Builder<Event>().setQuery(query, Event.class).build();
-            recyclerAdapter = new FirebaseRecyclerAdapter<Event, GroupEventViewHolder>
-                (firebaseRecyclerOptions) {
+        query = mRef.child("Groups").child(groupName).child("Events").child(Integer.toString(key));
+        FirebaseRecyclerOptions<Event> firebaseRecyclerOptions = new FirebaseRecyclerOptions.Builder<Event>().setQuery(query, Event.class).build();
+        recyclerAdapter = new FirebaseRecyclerAdapter<Event, GroupEventViewHolder>(firebaseRecyclerOptions) {
                 @Override
                 public GroupEventViewHolder onCreateViewHolder (ViewGroup parent, int viewType) {
                     View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.event_info_group, parent, false);
@@ -84,8 +83,6 @@ public class EventsTodayGroup extends AppCompatActivity implements View.OnClickL
                     viewHolder.setRemarks(model.getRemarks());
                     }
                 };
-            numMembers--;
-            }
         myRecyclerView.setAdapter(recyclerAdapter);
     }
 

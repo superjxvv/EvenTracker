@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,10 +22,14 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -44,6 +49,8 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
     private TimePickerDialog.OnTimeSetListener startTimeSetListener;
     private TimePickerDialog.OnTimeSetListener endTimeSetListener;
     private DatabaseReference eventDB;
+    private DatabaseReference mRef;
+    private ArrayList<String> groups;
     private Button addEventBtn;
     private EditText eventName;
     private EditText remarks;
@@ -217,22 +224,46 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
         }
         if(view == addEventBtn) {
             Toast.makeText(addEvent.this, "Added Successfully!", Toast.LENGTH_SHORT).show();
-            String userId = firebaseAuth.getCurrentUser().getUid();
             String email = firebaseAuth.getCurrentUser().getEmail();
             int numDays = (end_Date - start_Date)+1;
-            for(int i=0; i<numDays; i++) {
-                int key = getKey(start_Date, i);
-                eventDB = FirebaseDatabase.getInstance().getReference().child("Users").
-                        child(encodeUserEmail(email)).child("Events").child(Integer.toString(key));
-                String eventId = eventDB.push().getKey();
-                String event_name = eventName.getText().toString().trim();
-                String start_time = startTime.getText().toString().trim();
-                String end_time = endTime.getText().toString().trim();
-                String start_date = startDate.getText().toString().trim();
-                String end_date = endDate.getText().toString().trim();
-                String remarks_ = remarks.getText().toString().trim();
-                Event event = new Event(event_name, start_time, end_time, start_date, end_date, remarks_, eventId);
-                eventDB.child(eventId).setValue(event);
+            mRef = FirebaseDatabase.getInstance().getReference();
+            mRef.child("Users").child(encodeUserEmail(email)).child("Groups").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    groups = (ArrayList<String>) snapshot.getValue();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(addEvent.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+            /*@Override
+            public void onCancelled(FirebaseError arg0) {
+                Toast.makeText(UserInfo.this, arg0.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+            */
+            });
+            int numGroups = groups.size();
+            while(numGroups>0) {
+                for (int i = 0; i < numDays; i++) {
+                    int key = getKey(start_Date, i);
+
+                    eventDB = FirebaseDatabase.getInstance().getReference().child("Users").
+                            child(encodeUserEmail(email)).child("Events").child(Integer.toString(key));
+                    String eventId = eventDB.push().getKey();
+                    String event_name = eventName.getText().toString().trim();
+                    String start_time = startTime.getText().toString().trim();
+                    String end_time = endTime.getText().toString().trim();
+                    String start_date = startDate.getText().toString().trim();
+                    String end_date = endDate.getText().toString().trim();
+                    String remarks_ = remarks.getText().toString().trim();
+                    Event event = new Event(event_name, start_time, end_time, start_date, end_date, remarks_, eventId);
+                    eventDB.child(eventId).setValue(event);
+                    mRef.child("Groups").child(groups.get(numGroups - 1)).child("Events").child(Integer.toString(key)).child(eventId).setValue(event);
+                    mRef.child("Groups").child(groups.get(numGroups-1)).child("Events").child(Integer.toString(key)).child(eventId).child("Emails").child(encodeUserEmail(email));
+                }
+                numGroups--;
             }
             Intent intent = new Intent(addEvent.this, EventsToday.class);
             intent.putExtra("date", date);

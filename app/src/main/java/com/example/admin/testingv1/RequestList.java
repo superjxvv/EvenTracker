@@ -53,7 +53,11 @@ public class RequestList extends AppCompatActivity {
             }
             @Override
             protected void onBindViewHolder(RequestViewHolder viewHolder, int position, final Request model) {
-                viewHolder.setDescription(model.getRequester(), model.getRequestType());
+                if(model.getEventName()!=null) {
+                    viewHolder.setDescription(model.getGroupName(), model.getRequester(), model.getEventName(), model.getStartTime(), model.getEndTime(), model.getStartDate(), model.getEndDate());
+                } else {
+                    viewHolder.setDescription(model.getRequester(), model.getRequestType());
+                }
                 viewHolder.acceptBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -63,6 +67,10 @@ public class RequestList extends AppCompatActivity {
                         if(requestType.equals("friendRequest")){
                             mRef.child("Users").child(encodeUserEmail(userEmail)).child("Friends").child(encodeUserEmail(requester));
                             mRef.child("Users").child(encodeUserEmail(requester)).child("Friends").child(encodeUserEmail(userEmail));
+                            mRef.child("Users").child(encodeUserEmail(userEmail)).child("Request").child(requestID).removeValue();
+                        } else if (requestType == null) {
+                            mRef.child("Users").child(encodeUserEmail(userEmail)).child
+                            mRef.child("Users").child(encodeUserEmail(userEmail)).child("Request").child(requestID).removeValue();
                         } else {
                             mRef.child("Users").child(encodeUserEmail(requester)).child("AcceptedRequests").child(encodeUserEmail(userEmail));
                             mRef.child("Users").child(encodeUserEmail(userEmail)).child("Request").child(requestID).removeValue();

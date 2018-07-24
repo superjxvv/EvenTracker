@@ -25,4 +25,9 @@ public class RequestViewHolder extends RecyclerView.ViewHolder {
             description.setText(requester + " has sent you a friend request.");
         }
     }
+
+    public void setDescription (String groupName, String requester, String eventName, String startTime, String endTime, String startDate, String endDate) {
+        TextView description = (TextView) mView.findViewById(R.id.description);
+        description.setText(requester +" from " +groupName +" has sent you an invitation to "+eventName +" from "+ startDate +" "+ startTime +" to " + endDate +" "+ endTime+" .");
+    }
 }
