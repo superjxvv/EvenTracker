@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class User implements Parcelable{
     private ArrayList<Event> events = new ArrayList <Event>();
+    private ArrayList<Group> groups = new ArrayList<Group>();
     private String userId;
 
     public User(String userId) {
@@ -17,6 +18,7 @@ public class User implements Parcelable{
 
     protected User(Parcel in) {
         events = in.createTypedArrayList(Event.CREATOR);
+        groups = in.createTypedArrayList(Group.CREATOR);
         userId = in.readString();
     }
 
@@ -51,7 +53,6 @@ public class User implements Parcelable{
     public void editEvent (Event event, Event editedEvent) {
         events.remove(event);
         events.add(editedEvent);
-
     }
 
     @Override
@@ -63,5 +64,22 @@ public class User implements Parcelable{
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeTypedList(events);
         parcel.writeString(userId);
+        parcel.writeTypedList(groups);
+    }
+
+    public ArrayList<Group> getGroups() {
+        return groups;
+    }
+
+    public void addGroup (Group group) {
+        groups.add(group);
+    }
+
+    public void removeGroup (Group group) {
+        groups.remove(group);
+    }
+
+    public void setGroups(ArrayList<Group> groups) {
+        this.groups = groups;
     }
 }

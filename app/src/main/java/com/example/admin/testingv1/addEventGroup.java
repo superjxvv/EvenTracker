@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-public class addEvent extends AppCompatActivity implements View.OnClickListener {
+public class addEventGroup extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = addEvent.class.getSimpleName();
     private TextView theDate;
@@ -58,11 +58,22 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
     private int end_Date = 0;
     private int start_Time = 800;
     private int end_Time = 900;
+    private Group group;
+    private ArrayList <String> members;
+    private int numMembers;
+    private String eventId;
+    private String event_name;
+    private String start_time;
+    private String end_time;
+    private String start_date;
+    private String end_date;
+    private String remarks_;
+    private int key;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_event);
+        setContentView(R.layout.activity_add_event_group);
 
         theDate = (TextView) findViewById(R.id.theDate);
         backToEventsToday = (Button) findViewById(R.id.backToEventsToday);
@@ -71,6 +82,7 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
 
         Intent incomingIntent = getIntent();
         date = incomingIntent.getStringExtra("date");
+        group = incomingIntent.getParcelableExtra("group");
         String [] info = date.split("/");
         int day = Integer.parseInt(info[0]);
         int month = Integer.parseInt(info [1]);
@@ -109,7 +121,7 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
                     endTime.setText(getTime(hourOfDay, minute));
                     end_Time = newEndTime;
                 } else {
-                    Toast.makeText(addEvent.this, "End time should be after start time.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(addEventGroup.this, "End time should be after start time.", Toast.LENGTH_LONG).show();
                 }
             }
         };
@@ -154,7 +166,7 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
                     end_Date = newEndDate;
                     endDate.setText(date);
                 } else {
-                    Toast.makeText(addEvent.this, "End date must be before start date.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(addEventGroup.this, "End date must be before start date.", Toast.LENGTH_LONG).show();
                 }
                 if(newEndDate == start_Date && start_Time > end_Time) {
                     end_Time = start_Time;
@@ -168,8 +180,9 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
     public void onClick(View view) {
         if(view == backToEventsToday){
             //will open login
-            Intent intent = new Intent(addEvent.this, EventsToday.class);
+            Intent intent = new Intent(addEventGroup.this, EventsTodayGroup.class);
             intent.putExtra("date", date);
+            intent.putExtra("group", group);
             startActivity(intent);
         }
         if(view == startDate) {
@@ -223,7 +236,7 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
             dialog.show();
         }
         if(view == addEventBtn) {
-            Toast.makeText(addEvent.this, "Added Successfully!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(addEventGroup.this, "Added Successfully! Invites sent to group members.", Toast.LENGTH_SHORT).show();
             String email = firebaseAuth.getCurrentUser().getEmail();
             int numDays = (end_Date - start_Date)+1;
             mRef = FirebaseDatabase.getInstance().getReference();
@@ -235,7 +248,7 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Toast.makeText(addEvent.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(addEventGroup.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                 }
 
             /*@Override
@@ -251,13 +264,13 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
 
                     eventDB = FirebaseDatabase.getInstance().getReference().child("Users").
                             child(encodeUserEmail(email)).child("Events").child(Integer.toString(key));
-                    String eventId = eventDB.push().getKey();
-                    String event_name = eventName.getText().toString().trim();
-                    String start_time = startTime.getText().toString().trim();
-                    String end_time = endTime.getText().toString().trim();
-                    String start_date = startDate.getText().toString().trim();
-                    String end_date = endDate.getText().toString().trim();
-                    String remarks_ = remarks.getText().toString().trim();
+                    eventId = eventDB.push().getKey();
+                    event_name = eventName.getText().toString().trim();
+                    start_time = startTime.getText().toString().trim();
+                    end_time = endTime.getText().toString().trim();
+                    start_date = startDate.getText().toString().trim();
+                    end_date = endDate.getText().toString().trim();
+                    remarks_ = remarks.getText().toString().trim();
                     Event event = new Event(event_name, start_time, end_time, start_date, end_date, remarks_, eventId);
                     eventDB.child(eventId).setValue(event);
                     mRef.child("Groups").child(groups.get(numGroups - 1)).child("Events").child(Integer.toString(key)).child(eventId).setValue(event);
@@ -265,8 +278,18 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
                 }
                 numGroups--;
             }
-            Intent intent = new Intent(addEvent.this, EventsToday.class);
+            members = group.getMembers();
+            numMembers = members.size();
+            while(numMembers>0) {
+                int num = numMembers - 1;
+                String requestId = mRef.child("Users").child(encodeUserEmail(members.get(num))).child("Request").push().getKey();
+                Request request = new Request(email, group.getGroupName(), event_name, start_time, end_time, start_date, end_date, requestId, remarks_, eventId);
+                mRef.child("Users").child(encodeUserEmail(members.get(num))).child("Request").child(requestId).setValue(request);
+                numMembers--;
+            }
+            Intent intent = new Intent(addEventGroup.this, EventsTodayGroup.class);
             intent.putExtra("date", date);
+            intent.putExtra("group", group);
             startActivity(intent);
         }
     }

@@ -35,6 +35,7 @@ public class groupCalendar extends AppCompatActivity implements View.OnClickList
                 String date = dayOfMonth + "/" + (month + 1) + "/" + year;
                 Intent intent = new Intent(groupCalendar.this, EventsTodayGroup.class);
                 intent.putExtra("date", date);
+                intent.putExtra("group", group);
                 startActivity(intent);
             }
         });

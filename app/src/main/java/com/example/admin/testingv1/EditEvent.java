@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,10 +19,14 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -47,10 +52,16 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
     private EditText remarks;
     private String userId;
     private Event event;
+    private DatabaseReference mRef;
+    private ArrayList<String> groups;
     private int start_Date;
     private int end_Date;
     private int start_Time;
     private int end_Time;
+    private String email;
+    private String eventId;
+    private int numGroups;
+    private int key;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -223,6 +234,27 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
             Toast.makeText(EditEvent.this, "Saved", Toast.LENGTH_SHORT).show();
             int numDays = getNumDays(start_Date, end_Date);
             removeEvent();
+
+            mRef = FirebaseDatabase.getInstance().getReference();
+            mRef.child("Users").child(encodeUserEmail(email)).child("Groups").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    groups = (ArrayList<String>) snapshot.getValue();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(EditEvent.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+            /*@Override
+            public void onCancelled(FirebaseError arg0) {
+                Toast.makeText(UserInfo.this, arg0.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+            */
+            });
+            int numGroups = groups.size();
+            while(numGroups>0) {
             for (int i = 0; i < numDays; i++) {
                 int key = getKey(start_Date, i);
                 FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -237,6 +269,10 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
                 String remarks_ = remarks.getText().toString().trim();
                 Event event2 = new Event(event_name, start_time, end_time, start_date, end_date, remarks_, eventId);
                 eventDB.child(eventId).setValue(event2);
+                mRef.child("Groups").child(groups.get(numGroups - 1)).child("Events").child(Integer.toString(key)).child(eventId).setValue(event2);
+                mRef.child("Groups").child(groups.get(numGroups-1)).child("Events").child(Integer.toString(key)).child(eventId).child("Emails").child(encodeUserEmail(email));
+                }
+                numGroups--;
             }
             Intent intent = new Intent(EditEvent.this, EventsToday.class);
             intent.putExtra("date", date);
@@ -289,14 +325,53 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
         year = Integer.parseInt(info2 [2]);
         end_Date = year *10000 + month *100 + day;
 
-        String eventId = event.getEventId();
-        String email = firebaseAuth.getCurrentUser().getEmail();
+        eventId = event.getEventId();
+        email = firebaseAuth.getCurrentUser().getEmail();
 
         int numDays = getNumDays(start_Date, end_Date);
+        mRef = FirebaseDatabase.getInstance().getReference();
+        mRef.child("Users").child(encodeUserEmail(email)).child("Groups").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                groups = (ArrayList<String>) snapshot.getValue();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(EditEvent.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            /*@Override
+            public void onCancelled(FirebaseError arg0) {
+                Toast.makeText(UserInfo.this, arg0.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+            */
+        });
+        numGroups = groups.size();
+        while(numGroups>0) {
         for (int i = 0; i < numDays; i++) {
-            int key = start_Date + i;
+            key = start_Date + i;
             FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email))
                     .child("Events").child(Integer.toString(key)).child(eventId).removeValue();
+            mRef.child("Groups").child(groups.get(numGroups - 1)).child("Events").child(Integer.toString(key))
+                    .child(eventId).child("Emails").child(encodeUserEmail(email)).removeValue();
+            mRef.child("Groups").child(groups.get(numGroups - 1)).child("Events").child(Integer.toString(key))
+                    .child(eventId).child("Emails").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                   if(snapshot.getValue()==null){
+                       mRef.child("Groups").child(groups.get(numGroups - 1)).child("Events").child(Integer.toString(key))
+                               .child(eventId).removeValue();
+                   }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(EditEvent.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        numGroups--;
         }
     }
 
