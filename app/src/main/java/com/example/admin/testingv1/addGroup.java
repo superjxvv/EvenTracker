@@ -43,6 +43,7 @@ public class addGroup extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getCurrentUser().getUid();
         userEmail = firebaseAuth.getCurrentUser().getEmail();
+        checkedMembers.add(encodeUserEmail(userEmail));
         mRef = FirebaseDatabase.getInstance().getReference();
         members = (RecyclerView) findViewById(R.id.members);
         members.setHasFixedSize(true);

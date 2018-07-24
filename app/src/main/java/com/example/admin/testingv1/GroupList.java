@@ -1,6 +1,7 @@
 package com.example.admin.testingv1;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,21 +10,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Iterator;
 
 public class GroupList extends AppCompatActivity implements View.OnClickListener {
     private Button addGroupBtn;
     private RecyclerView myRecyclerView;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mRef;
-    private String userID;
-    private FirebaseRecyclerAdapter <Group, GroupViewHolder> recyclerAdapter;
+    private FirebaseRecyclerAdapter <String, GroupViewHolder> recyclerAdapter;
     private String userEmail;
 
     @Override
@@ -35,7 +41,6 @@ public class GroupList extends AppCompatActivity implements View.OnClickListener
 
         addGroupBtn = (Button) findViewById(R.id.backBtn);
         firebaseAuth = FirebaseAuth.getInstance();
-        userID = firebaseAuth.getCurrentUser().getUid();
         userEmail = firebaseAuth.getCurrentUser().getEmail();
         myRecyclerView = (RecyclerView) findViewById(R.id.groupsRecyclerView);
         myRecyclerView.setHasFixedSize(true);
@@ -44,8 +49,8 @@ public class GroupList extends AppCompatActivity implements View.OnClickListener
 
         mRef = FirebaseDatabase.getInstance().getReference();
         Query query = mRef.child("Users").child(encodeUserEmail(userEmail)).child("Groups");
-        FirebaseRecyclerOptions<Group> firebaseRecyclerOptions = new FirebaseRecyclerOptions.Builder<Group>().setQuery(query, Group.class).build();
-        recyclerAdapter = new FirebaseRecyclerAdapter<Group, GroupViewHolder>
+        FirebaseRecyclerOptions<String> firebaseRecyclerOptions = new FirebaseRecyclerOptions.Builder<String>().setQuery(query, String.class).build();
+        recyclerAdapter = new FirebaseRecyclerAdapter<String, GroupViewHolder>
                 (firebaseRecyclerOptions) {
             @Override
             public GroupViewHolder onCreateViewHolder (ViewGroup parent, int viewType) {
@@ -53,14 +58,24 @@ public class GroupList extends AppCompatActivity implements View.OnClickListener
                 return new GroupViewHolder(view);
             }
             @Override
-            protected void onBindViewHolder(GroupViewHolder viewHolder, int position, final Group model) {
-                viewHolder.setGroupName(model.getGroupName());
-                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+            protected void onBindViewHolder(final GroupViewHolder viewHolder, int position, final String model) {
+                FirebaseDatabase.getInstance().getReference().child("Groups").child(model).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(GroupList.this, groupCalendar.class);
-                        intent.putExtra("Group", model);
-                        startActivity(intent);
+                    public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                        viewHolder.setGroupName(dataSnapshot.getValue(Group.class).getGroupName().toString());
+                        viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = new Intent(GroupList.this, groupCalendar.class);
+                                intent.putExtra("Group", dataSnapshot.getValue(Group.class));
+                                startActivity(intent);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Toast.makeText(GroupList.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }

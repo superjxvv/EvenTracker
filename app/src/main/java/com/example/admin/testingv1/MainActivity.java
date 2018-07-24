@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.sql.Ref;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,10 +85,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if(task.isSuccessful()) {
                             Toast.makeText(MainActivity.this, "Registered Successfully!", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                            myRef = FirebaseDatabase.getInstance().getReference("Users");
+                            myRef = FirebaseDatabase.getInstance().getReference();
                             String userId = firebaseAuth.getCurrentUser().getUid();
                             User user = new User(userId);
-                            myRef.child(encodeUserEmail(email)).setValue(user);
+                            myRef.child("Users").child(encodeUserEmail(email)).setValue(user);
+                            ArrayList<String> members = new ArrayList<String>();
+                            members.add(encodeUserEmail(firebaseAuth.getCurrentUser().getEmail()));
+                            String groupID = myRef.child("groups").push().getKey();
+                            Group group = new Group(members, firebaseAuth.getCurrentUser().getEmail(), groupID);
+                            myRef.child("Groups").child(groupID).setValue(group);
+                            myRef.child("Users").child(encodeUserEmail(firebaseAuth.getCurrentUser().getEmail())).child("Groups").child(groupID).setValue(groupID);
                             startActivity(intent);
                         }else{
                             Toast.makeText(MainActivity.this, "Could not register, please try again.", Toast.LENGTH_SHORT).show();

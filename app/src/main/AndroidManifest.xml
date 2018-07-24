@@ -50,7 +50,9 @@
         <activity
             android:name=".FriendList"
             android:parentActivityName=".ProfileActivity" />
-        <activity android:name=".setName" />
+        <activity
+            android:name=".setName"
+            android:windowSoftInputMode="adjustNothing"/>
         <activity android:name=".checkMemberViewHolder" />
         <activity
             android:name=".Notifications"

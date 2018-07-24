@@ -29,6 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 
 public class EditEvent extends AppCompatActivity implements View.OnClickListener {
 
@@ -53,7 +54,7 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
     private String userId;
     private Event event;
     private DatabaseReference mRef;
-    private ArrayList<String> groups;
+    private ArrayList<String> groups_ = new ArrayList<String>();
     private int start_Date;
     private int end_Date;
     private int start_Time;
@@ -232,14 +233,17 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
         }
         if (view == save) {
             Toast.makeText(EditEvent.this, "Saved", Toast.LENGTH_SHORT).show();
-            int numDays = getNumDays(start_Date, end_Date);
             removeEvent();
-
             mRef = FirebaseDatabase.getInstance().getReference();
-            mRef.child("Users").child(encodeUserEmail(email)).child("Groups").addListenerForSingleValueEvent(new ValueEventListener() {
+            mRef.child("Users").child(encodeUserEmail(email)).child("Groups").addValueEventListener(new ValueEventListener() {
                 @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    groups = (ArrayList<String>) snapshot.getValue();
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Iterator<DataSnapshot> groups = dataSnapshot.getChildren().iterator();
+                    while (groups.hasNext()) {
+                        DataSnapshot group = groups.next();
+                        groups_.add(group.getValue().toString());
+                    }
+                    addEventToDatabase();
                 }
 
                 @Override
@@ -253,30 +257,6 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
             }
             */
             });
-            int numGroups = groups.size();
-            while(numGroups>0) {
-            for (int i = 0; i < numDays; i++) {
-                int key = getKey(start_Date, i);
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                String email = user.getEmail();
-                eventDB = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("Events").child(Integer.toString(key));
-                String eventId = event.getEventId();
-                String event_name = eventName.getText().toString().trim();
-                String start_time = startTime.getText().toString().trim();
-                String end_time = endTime.getText().toString().trim();
-                String start_date = startDate.getText().toString().trim();
-                String end_date = endDate.getText().toString().trim();
-                String remarks_ = remarks.getText().toString().trim();
-                Event event2 = new Event(event_name, start_time, end_time, start_date, end_date, remarks_, eventId);
-                eventDB.child(eventId).setValue(event2);
-                mRef.child("Groups").child(groups.get(numGroups - 1)).child("Events").child(Integer.toString(key)).child(eventId).setValue(event2);
-                mRef.child("Groups").child(groups.get(numGroups-1)).child("Events").child(Integer.toString(key)).child(eventId).child("Emails").child(encodeUserEmail(email));
-                }
-                numGroups--;
-            }
-            Intent intent = new Intent(EditEvent.this, EventsToday.class);
-            intent.putExtra("date", date);
-            startActivity(intent);
         }
         if (view == delete) {
             removeEvent();
@@ -286,6 +266,34 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
         }
     }
 
+    public void addEventToDatabase(){
+        int numDays = getNumDays(start_Date, end_Date);
+        numGroups = groups_.size();
+        while(numGroups>0) {
+            for (int i = 0; i < numDays; i++) {
+                int key = getKey(start_Date, i);
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                String email = user.getEmail();
+                eventDB = FirebaseDatabase.getInstance().getReference().child("Users")
+                        .child(encodeUserEmail(email)).child("Events").child(Integer.toString(key));
+                String eventId = event.getEventId();
+                String event_name = eventName.getText().toString().trim();
+                String start_time = startTime.getText().toString().trim();
+                String end_time = endTime.getText().toString().trim();
+                String start_date = startDate.getText().toString().trim();
+                String end_date = endDate.getText().toString().trim();
+                String remarks_ = remarks.getText().toString().trim();
+                Event event2 = new Event(event_name, start_time, end_time, start_date, end_date, remarks_, eventId);
+                eventDB.child(eventId).setValue(event2);
+                mRef.child("Groups").child(groups_.get(numGroups - 1)).child("Events").child(Integer.toString(key)).child(eventId).setValue(event2);
+                mRef.child("Groups").child(groups_.get(numGroups-1)).child("Events").child(Integer.toString(key)).child(eventId).child("Emails").child(encodeUserEmail(email));
+            }
+            numGroups--;
+        }
+        Intent intent = new Intent(EditEvent.this, EventsToday.class);
+        intent.putExtra("date", date);
+        startActivity(intent);
+    }
     private String getTime (int hourOfDay, int minute){
         String time;
         if(hourOfDay <10 && minute <10){
@@ -328,12 +336,16 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
         eventId = event.getEventId();
         email = firebaseAuth.getCurrentUser().getEmail();
 
-        int numDays = getNumDays(start_Date, end_Date);
         mRef = FirebaseDatabase.getInstance().getReference();
         mRef.child("Users").child(encodeUserEmail(email)).child("Groups").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                groups = (ArrayList<String>) snapshot.getValue();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> groups = dataSnapshot.getChildren().iterator();
+                while (groups.hasNext()) {
+                    DataSnapshot group = groups.next();
+                    groups_.add(group.getValue().toString());
+                }
+                removeEventFromDatabase();
             }
 
             @Override
@@ -347,32 +359,37 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
             }
             */
         });
-        numGroups = groups.size();
-        while(numGroups>0) {
-        for (int i = 0; i < numDays; i++) {
-            key = start_Date + i;
-            FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email))
-                    .child("Events").child(Integer.toString(key)).child(eventId).removeValue();
-            mRef.child("Groups").child(groups.get(numGroups - 1)).child("Events").child(Integer.toString(key))
-                    .child(eventId).child("Emails").child(encodeUserEmail(email)).removeValue();
-            mRef.child("Groups").child(groups.get(numGroups - 1)).child("Events").child(Integer.toString(key))
-                    .child(eventId).child("Emails").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                   if(snapshot.getValue()==null){
-                       mRef.child("Groups").child(groups.get(numGroups - 1)).child("Events").child(Integer.toString(key))
-                               .child(eventId).removeValue();
-                   }
-                }
+    }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Toast.makeText(EditEvent.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+    public void removeEventFromDatabase(){
+        numGroups = groups_.size();
+        final int numDays = getNumDays(start_Date, end_Date);
+        mRef.child("Groups").child(groups_.get(numGroups - 1)).child("Events").child(Integer.toString(key))
+                .child(eventId).child("Emails").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                while(numGroups>0) {
+                    for (int i = 0; i < numDays; i++) {
+                        key = start_Date + i;
+                        FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email))
+                                .child("Events").child(Integer.toString(key)).child(eventId).removeValue();
+                        mRef.child("Groups").child(groups_.get(numGroups - 1)).child("Events").child(Integer.toString(key))
+                                .child(eventId).child("Emails").child(encodeUserEmail(email)).removeValue();
+                        if(snapshot.getValue()==null){
+                            mRef.child("Groups").child(groups_.get(numGroups - 1)).child("Events").child(Integer.toString(key))
+                                    .child(eventId).removeValue();
+                        }
+                    }
+                    numGroups--;
                 }
-            });
-        }
-        numGroups--;
-        }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(EditEvent.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     private int getNumDays(int start, int end) {

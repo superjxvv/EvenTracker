@@ -45,10 +45,12 @@ public class setName extends AppCompatActivity {
         userID = firebaseAuth.getCurrentUser().getUid();
         userEmail = firebaseAuth.getCurrentUser().getEmail();
         groupsRecyclerView = (RecyclerView) findViewById(R.id.groupsRecyclerView);
+        numParticipants = (TextView) findViewById(R.id.numParticipants);
         groupsRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         Intent incomingIntent = getIntent();
         final ArrayList<String> participants = incomingIntent.getStringArrayListExtra("checkedMembers");
+        numParticipants.setText("Number of Participants: " + participants.size());
         mAdapter = new MainAdapter(participants);
         groupsRecyclerView.setLayoutManager(mLayoutManager);
         groupsRecyclerView.setAdapter(mAdapter);
@@ -58,11 +60,11 @@ public class setName extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(setName.this, GroupList.class);
-                groupDB = mRef.child("groups");
+                groupDB = mRef.child("Groups");
                 String groupID = groupDB.push().getKey();
                 Group group = new Group(participants, groupName.getText().toString().trim(), groupID);
                 for (int i = 0; i < participants.size(); i++) {
-                    mRef.child("Users").child(participants.get(i)).child("Groups").setValue(groupID);
+                    mRef.child("Users").child(participants.get(i)).child("Groups").child(groupID).setValue(groupID);
                 }
                 groupDB.child(groupID).setValue(group);
                 startActivity(intent);

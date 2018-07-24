@@ -10,7 +10,6 @@
         android:id="@+id/groupsRecyclerView"
         android:layout_width="368dp"
         android:layout_height="312dp"
-        android:layout_marginBottom="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -28,9 +27,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint="Type group subject here..."
+        android:hint="Type Group Subject Here..."
         android:inputType="text"
-        android:text="Name"
         app:layout_constraintBottom_toTopOf="@+id/groupsRecyclerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -55,14 +53,14 @@
 
     <TextView
         android:id="@+id/numParticipants"
-        android:layout_width="109dp"
-        android:layout_height="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
+        android:text="NumParticipants"
+        android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/groupsRecyclerView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/groupName"
-        app:layout_constraintVertical_bias="0.916" />
+        app:layout_constraintTop_toBottomOf="@+id/groupName" />
 </android.support.constraint.ConstraintLayout>

@@ -14,7 +14,6 @@ public class groupCalendar extends AppCompatActivity implements View.OnClickList
     private CalendarView calendarView;
     private TextView groupName;
     private FirebaseAuth firebaseAuth;
-    private String userID;
     private Group group;
 
     @Override
@@ -25,7 +24,6 @@ public class groupCalendar extends AppCompatActivity implements View.OnClickList
         calendarView = (CalendarView) findViewById(R.id.groupCalenderView);
         groupName = (TextView) findViewById(R.id.Description);
         firebaseAuth = FirebaseAuth.getInstance();
-        userID = firebaseAuth.getCurrentUser().getUid();
         Intent incomingIntent = getIntent();
         group = incomingIntent.getParcelableExtra("Group");
 

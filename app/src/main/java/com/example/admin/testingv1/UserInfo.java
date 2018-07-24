@@ -18,13 +18,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Iterator;
+
 public class UserInfo extends AppCompatActivity implements View.OnClickListener {
     private String email;
     private Button requestBtn;
     private TextView unfriendBtn;
     private FirebaseAuth firebaseAuth;
     private String userEmail_;
-    private String Uid;
     private DatabaseReference myRef;
     private TextView email_;
     private boolean friend;
@@ -47,7 +48,6 @@ public class UserInfo extends AppCompatActivity implements View.OnClickListener 
         unfriendBtn = (TextView) findViewById(R.id.unFriendBtn);
         unfriendBtn.setText("");
 
-        Uid = firebaseAuth.getCurrentUser().getUid();
         firebaseAuth = FirebaseAuth.getInstance();
         myRef = FirebaseDatabase.getInstance().getReference().child("Users");
         email_.setText(email);
@@ -79,23 +79,45 @@ public class UserInfo extends AppCompatActivity implements View.OnClickListener 
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(UserInfo.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
-
-            /*@Override
-            public void onCancelled(FirebaseError arg0) {
-                Toast.makeText(UserInfo.this, arg0.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-            */
         });
         return friend;
+    }
+
+    private boolean alreadyRequest (){
+        final Boolean[] requested = new Boolean[1];
+        myRef.child(encodeUserEmail(email)).child("Request").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Iterator<DataSnapshot> requests = snapshot.getChildren().iterator();
+                while (requests.hasNext()) {
+                    DataSnapshot request = requests.next();
+                    if(((Request)request.getValue()).getRequester().equals(userEmail_)) {
+                        requested[0] = true;
+                        return;
+                    }
+                }
+                requested[0] = false;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(UserInfo.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        return requested[0];
     }
 
     @Override
     public void onClick(View view) {
         if(view == requestBtn){
             if (requestBtn.getText().equals("Send friend request")){
-                String requestId = myRef.child(encodeUserEmail(email)).child("Request").push().getKey();
-                Request request = new Request (userEmail_, "friendRequest", requestId);
-                myRef.child(encodeUserEmail(email)).child("Request").child(requestId).setValue(request);
+                if(!alreadyRequest()) {
+                    String requestId = myRef.child(encodeUserEmail(email)).child("Request").push().getKey();
+                    Request request = new Request(userEmail_, "friendRequest", requestId);
+                    myRef.child(encodeUserEmail(email)).child("Request").child(requestId).setValue(request);
+                }else {
+                    Toast.makeText(UserInfo.this, "Already sent request.", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 String requestId = myRef.child(encodeUserEmail(email)).child("Request").push().getKey();
                 Request request = new Request (userEmail_, "ViewCalendarRequest", requestId);

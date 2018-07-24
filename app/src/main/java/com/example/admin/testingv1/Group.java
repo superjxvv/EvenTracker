@@ -15,6 +15,7 @@ public class Group implements Parcelable{
         this.members = members;
         this.groupName = groupName;
         this.groupID = groupID;
+        this.size = members.size();
     }
 
     public Group() {
