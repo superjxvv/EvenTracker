@@ -1,6 +1,7 @@
 package com.example.admin.testingv1;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,15 +12,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 
 public class setName extends AppCompatActivity {
 
@@ -34,6 +41,10 @@ public class setName extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
     private DatabaseReference groupDB;
+    private ArrayList <String> dates = new ArrayList<String>();
+    private int i, j;
+    private DataSnapshot event;
+    private String groupID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +64,11 @@ public class setName extends AppCompatActivity {
         Intent incomingIntent = getIntent();
         final ArrayList<String> participants = incomingIntent.getStringArrayListExtra("checkedMembers");
         numParticipants.setText("Number of Participants: " + participants.size());
-        mAdapter = new MainAdapter(participants);
+        ArrayList <String> decodeparticipants = new ArrayList<String>();
+        for(int i=0; i<participants.size(); i++){
+            decodeparticipants.add(decodeUserEmail(participants.get(i)));
+        }
+        mAdapter = new MainAdapter(decodeparticipants);
         groupsRecyclerView.setLayoutManager(mLayoutManager);
         groupsRecyclerView.setAdapter(mAdapter);
         done = (FloatingActionButton) findViewById(R.id.done);
@@ -63,16 +78,75 @@ public class setName extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(setName.this, GroupList.class);
                 groupDB = mRef.child("Groups");
-                String groupID = groupDB.push().getKey();
-                Group group = new Group(participants, groupName.getText().toString().trim(), groupID);
+                groupID = groupDB.push().getKey();
+                Group group = new Group(participants, groupName.getText().toString().trim(), groupID, userEmail);
                 for (int i = 0; i < participants.size(); i++) {
                     mRef.child("Users").child(participants.get(i)).child("Groups").child(groupID).setValue(groupID);
+                    mRef.child(participants.get(i)).child("Events").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            if (snapshot.getValue() != null) {
+                                ArrayList<String> values = (ArrayList<String>) snapshot.getValue();
+                                for (int i = 0; i < values.size(); i++) {
+                                    dates.add(values.get(i));
+                                }
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                dates = makeUnique(dates);
+
+                for(i=0; i<dates.size(); i++){
+                    for(j=0; j<participants.size();j++){
+                        mRef.child("Users").child(participants.get(j)).child("Events").child(dates.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot snapshot) {
+                                if (snapshot.getValue() != null) { //event exist in this date
+                                    Iterator<DataSnapshot> events = snapshot.getChildren().iterator();
+                                    while (events.hasNext()) {
+                                        event = events.next();
+                                        mRef.child("Users").child(participants.get(j)).child("Events").child(dates.get(i)).child(event.getValue().toString()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot snapshot) {
+                                        Event event_ = snapshot.getValue(Event.class);
+                                        groupDB.child(groupID).child("Events").child(dates.get(i)).child(event.getValue().toString()).setValue(event_);
+                                        }
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                            Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 }
                 groupDB.child(groupID).setValue(group);
                 startActivity(intent);
             }
         });
     }
+
+    public ArrayList makeUnique(ArrayList<String> list) {
+        ArrayList<String> uniqueList = new ArrayList<String>();
+        for(int i=0; i<list.size(); i++) {
+            if (!uniqueList.contains(list.get(i))) {
+                uniqueList.add(list.get(i));
+            }
+        }
+        return uniqueList;
+    }
+
     public String encodeUserEmail(String userEmail) {
         return userEmail.replace(".", ",");
     }

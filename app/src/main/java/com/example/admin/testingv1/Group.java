@@ -10,12 +10,14 @@ public class Group implements Parcelable{
     private String groupName;
     private int size = 0;
     private String groupID;
+    private String leader;
 
-    public Group(ArrayList<String> members, String groupName, String groupID) {
+    public Group(ArrayList<String> members, String groupName, String groupID, String leader) {
         this.members = members;
         this.groupName = groupName;
         this.groupID = groupID;
         this.size = members.size();
+        this.leader = leader;
     }
 
     public Group() {
@@ -26,6 +28,7 @@ public class Group implements Parcelable{
         groupName = in.readString();
         size = in.readInt();
         groupID = in.readString();
+        leader = in.readString();
     }
 
     public static final Creator<Group> CREATOR = new Creator<Group>() {
@@ -72,6 +75,14 @@ public class Group implements Parcelable{
         return groupID;
     }
 
+    public String getLeader (){
+        return leader;
+    }
+
+    public void setLeader(String leader2) {
+        leader = leader2;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -83,5 +94,6 @@ public class Group implements Parcelable{
         parcel.writeString(groupName);
         parcel.writeInt(size);
         parcel.writeString(groupID);
+        parcel.writeString(leader);
     }
 }
