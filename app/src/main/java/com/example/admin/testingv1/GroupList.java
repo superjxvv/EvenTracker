@@ -61,13 +61,14 @@ public class GroupList extends AppCompatActivity implements View.OnClickListener
             protected void onBindViewHolder(final GroupViewHolder viewHolder, int position, final String model) {
                 FirebaseDatabase.getInstance().getReference().child("Groups").child(model).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-                        viewHolder.setGroupName(dataSnapshot.getValue(Group.class).getGroupName().toString());
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        final Group group = dataSnapshot.getValue(Group.class);
+                        viewHolder.setGroupName(group.getGroupName().toString());
                         viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 Intent intent = new Intent(GroupList.this, groupCalendar.class);
-                                intent.putExtra("Group", dataSnapshot.getValue(Group.class));
+                                intent.putExtra("Group", group);
                                 startActivity(intent);
                             }
                         });

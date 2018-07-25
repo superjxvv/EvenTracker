@@ -40,6 +40,8 @@ public class setName extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_name);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         firebaseAuth = FirebaseAuth.getInstance();
         mRef = FirebaseDatabase.getInstance().getReference();
         userID = firebaseAuth.getCurrentUser().getUid();

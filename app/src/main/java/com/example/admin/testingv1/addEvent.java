@@ -62,6 +62,14 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
     private int end_Date = 0;
     private int start_Time = 800;
     private int end_Time = 900;
+    private String eventId;
+    private String event_name;
+    private String start_time;
+    private String end_time;
+    private String start_date;
+    private String end_date ;
+    private String remarks_;
+    private Event event;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -258,26 +266,28 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
     public void addEventToDatabase(String email){
         int numGroup = groups_.size();
         int numDays = (end_Date - start_Date)+1;
-        while (numGroup>0){
+        int j = 0;
+        eventDB = FirebaseDatabase.getInstance().getReference().child("Users").
+                child(encodeUserEmail(email)).child("Events");
+        eventId = eventDB.push().getKey();
+        event_name = eventName.getText().toString().trim();
+        start_time = startTime.getText().toString().trim();
+        end_time = endTime.getText().toString().trim();
+        start_date = startDate.getText().toString().trim();
+        end_date = endDate.getText().toString().trim();
+        remarks_ = remarks.getText().toString().trim();
+        event = new Event(event_name, start_time, end_time, start_date, end_date, remarks_, eventId);
+        while (numGroup>j){
             for (int i = 0; i < numDays; i++) {
                 int key = getKey(start_Date, i);
-
-                eventDB = FirebaseDatabase.getInstance().getReference().child("Users").
-                        child(encodeUserEmail(email)).child("Events").child(Integer.toString(key));
-                String eventId = eventDB.push().getKey();
-                String event_name = eventName.getText().toString().trim();
-                String start_time = startTime.getText().toString().trim();
-                String end_time = endTime.getText().toString().trim();
-                String start_date = startDate.getText().toString().trim();
-                String end_date = endDate.getText().toString().trim();
-                String remarks_ = remarks.getText().toString().trim();
-                Event event = new Event(event_name, start_time, end_time, start_date, end_date, remarks_, eventId);
-                eventDB.child(eventId).setValue(event);
-                mRef.child("Groups").child(groups_.get(numGroup - 1)).child("Events").child(Integer.toString(key)).child(eventId).setValue(event);
-                mRef.child("Groups").child(groups_.get(numGroup - 1)).child("Events").child(Integer.toString(key))
+                if(j == 0) {
+                    eventDB.child(Integer.toString(key)).child(eventId).setValue(event);
+                }
+                mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key)).child(eventId).setValue(event);
+                mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key))
                         .child(eventId).child("Emails").child(encodeUserEmail(email)).setValue(encodeUserEmail(email));
             }
-            numGroup--;
+            j++;
         }
         Intent intent = new Intent(addEvent.this, EventsToday.class);
         intent.putExtra("date", date);
