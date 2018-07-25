@@ -82,14 +82,13 @@ public class setName extends AppCompatActivity {
                 Group group = new Group(participants, groupName.getText().toString().trim(), groupID, userEmail);
                 for (int i = 0; i < participants.size(); i++) {
                     mRef.child("Users").child(participants.get(i)).child("Groups").child(groupID).setValue(groupID);
-                    mRef.child(participants.get(i)).child("Events").addListenerForSingleValueEvent(new ValueEventListener() {
+                    mRef.child("Users").child(participants.get(i)).child("Events").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
-                            if (snapshot.getValue() != null) {
-                                ArrayList<String> values = (ArrayList<String>) snapshot.getValue();
-                                for (int i = 0; i < values.size(); i++) {
-                                    dates.add(values.get(i));
-                                }
+                            Iterator<DataSnapshot> values = snapshot.getChildren().iterator();
+                            while (values.hasNext()) {
+                                DataSnapshot value = values.next();
+                                dates.add(value.getKey());
                             }
                         }
                         @Override
@@ -106,23 +105,23 @@ public class setName extends AppCompatActivity {
                         mRef.child("Users").child(participants.get(j)).child("Events").child(dates.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot snapshot) {
-                                if (snapshot.getValue() != null) { //event exist in this date
+                                if (snapshot.getValue(Event.class) != null) { //event exist in this date
                                     Iterator<DataSnapshot> events = snapshot.getChildren().iterator();
                                     while (events.hasNext()) {
                                         event = events.next();
-                                        mRef.child("Users").child(participants.get(j)).child("Events").child(dates.get(i)).child(event.getValue().toString()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        mRef.child("Users").child(participants.get(j)).child("Events").child(dates.get(i)).child(event.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(DataSnapshot snapshot) {
-                                        Event event_ = snapshot.getValue(Event.class);
-                                        groupDB.child(groupID).child("Events").child(dates.get(i)).child(event.getValue().toString()).setValue(event_);
-                                        }
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                            Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                                Event event_ = snapshot.getValue(Event.class);
+                                                groupDB.child(groupID).child("Events").child(dates.get(i)).child(event.getKey()).setValue(event_);
+                                            }
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
                                 }
-                            }
                             }
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
