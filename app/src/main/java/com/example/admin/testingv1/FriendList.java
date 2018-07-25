@@ -60,7 +60,7 @@ public class FriendList extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(FriendList.this, UserInfo.class);
-                        intent.putExtra("User", model);
+                        intent.putExtra("Email", model);
                         startActivity(intent);
                     }
                 });

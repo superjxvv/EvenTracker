@@ -20,7 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Iterator;
 
-public class UserInfo extends AppCompatActivity implements View.OnClickListener {
+public class UserInfo extends AppCompatActivity {
     private String email;
     private Button requestBtn;
     private TextView unfriendBtn;
@@ -29,6 +29,7 @@ public class UserInfo extends AppCompatActivity implements View.OnClickListener 
     private DatabaseReference myRef;
     private TextView email_;
     private boolean friend;
+    private Boolean requested = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,28 +52,50 @@ public class UserInfo extends AppCompatActivity implements View.OnClickListener 
         firebaseAuth = FirebaseAuth.getInstance();
         myRef = FirebaseDatabase.getInstance().getReference().child("Users");
         email_.setText(email);
+        isFriend ();
 
-        if(isFriend()){
-            requestBtn.setText("Send request to view calendar");
-            unfriendBtn.setText("Unfriend");
-            unfriendBtn.setOnClickListener(this);
-        } else {
-            requestBtn.setText("Send friend request");
-        }
-
-        requestBtn.setOnClickListener(this);
     }
 
-    private boolean isFriend (){
+    private void isFriend (){
         myRef.child(encodeUserEmail(userEmail_)).child("Friends").child(encodeUserEmail(email)).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.getValue() != null) {
-                    friend = true;
+                    requestBtn.setText("Send request to view calendar");
+                    unfriendBtn.setText("Unfriend");
+                    unfriendBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            myRef.child(encodeUserEmail(userEmail_)).child("Friends").child(encodeUserEmail(email)).removeValue();
+                            myRef.child(encodeUserEmail(email)).child("Friends").child(encodeUserEmail(userEmail_)).removeValue();
+                            Toast.makeText(UserInfo.this, "Unfriended.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 } else {
                     //user does not exist
-                    friend = false;
+                    requestBtn.setText("Send friend request");
                 }
+                requestBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (requestBtn.getText().equals("Send friend request")){
+                            alreadyRequest ();
+                            if(!requested) {
+                                String requestId = myRef.child(encodeUserEmail(email)).child("Request").push().getKey();
+                                Request request = new Request(userEmail_, "friendRequest", requestId);
+                                myRef.child(encodeUserEmail(email)).child("Request").child(requestId).setValue(request);
+                                Toast.makeText(UserInfo.this, "Request sent!", Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(UserInfo.this, "Already sent request.", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            String requestId = myRef.child(encodeUserEmail(email)).child("Request").push().getKey();
+                            Request request = new Request (userEmail_, "ViewCalendarRequest", requestId);
+                            myRef.child(encodeUserEmail(email)).child("Request").child(requestId).setValue(request);
+                            Toast.makeText(UserInfo.this, "Request sent!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
 
             @Override
@@ -80,23 +103,21 @@ public class UserInfo extends AppCompatActivity implements View.OnClickListener 
                 Toast.makeText(UserInfo.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-        return friend;
     }
 
-    private boolean alreadyRequest (){
-        final Boolean[] requested = new Boolean[1];
+    private void alreadyRequest (){
         myRef.child(encodeUserEmail(email)).child("Request").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Iterator<DataSnapshot> requests = snapshot.getChildren().iterator();
                 while (requests.hasNext()) {
                     DataSnapshot request = requests.next();
-                    if(((Request)request.getValue()).getRequester().equals(userEmail_)) {
-                        requested[0] = true;
+                    if((request.getValue(Request.class)).getRequester().equals(userEmail_)) {
+                        requested = true;
                         return;
                     }
                 }
-                requested[0] = false;
+                requested = false;
             }
 
             @Override
@@ -104,33 +125,6 @@ public class UserInfo extends AppCompatActivity implements View.OnClickListener 
                 Toast.makeText(UserInfo.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-        return requested[0];
-    }
-
-    @Override
-    public void onClick(View view) {
-        if(view == requestBtn){
-            if (requestBtn.getText().equals("Send friend request")){
-                if(!alreadyRequest()) {
-                    String requestId = myRef.child(encodeUserEmail(email)).child("Request").push().getKey();
-                    Request request = new Request(userEmail_, "friendRequest", requestId);
-                    myRef.child(encodeUserEmail(email)).child("Request").child(requestId).setValue(request);
-                }else {
-                    Toast.makeText(UserInfo.this, "Already sent request.", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                String requestId = myRef.child(encodeUserEmail(email)).child("Request").push().getKey();
-                Request request = new Request (userEmail_, "ViewCalendarRequest", requestId);
-                myRef.child(encodeUserEmail(email)).child("Request").child(requestId).setValue(request);
-            }
-            Toast.makeText(UserInfo.this, "Request sent!", Toast.LENGTH_SHORT).show();
-        }
-
-        if(view == unfriendBtn){
-            myRef.child(encodeUserEmail(userEmail_)).child("Friends").child(encodeUserEmail(email)).removeValue();
-            myRef.child(encodeUserEmail(email)).child("Friends").child(encodeUserEmail(userEmail_)).removeValue();
-            Toast.makeText(UserInfo.this, "Unfriended.", Toast.LENGTH_SHORT).show();
-        }
     }
 
     public String encodeUserEmail(String userEmail) {
