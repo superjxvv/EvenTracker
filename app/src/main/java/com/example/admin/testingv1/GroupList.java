@@ -31,6 +31,7 @@ public class GroupList extends AppCompatActivity implements View.OnClickListener
     private DatabaseReference mRef;
     private FirebaseRecyclerAdapter <String, GroupViewHolder> recyclerAdapter;
     private String userEmail;
+    private Group group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,7 @@ public class GroupList extends AppCompatActivity implements View.OnClickListener
                 FirebaseDatabase.getInstance().getReference().child("Groups").child(model).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        final Group group = dataSnapshot.getValue(Group.class);
+                        group = dataSnapshot.getValue(Group.class);
                         viewHolder.setGroupName(group.getGroupName().toString());
                         viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override

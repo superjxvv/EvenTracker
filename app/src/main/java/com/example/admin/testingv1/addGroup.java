@@ -59,7 +59,7 @@ public class addGroup extends AppCompatActivity {
             }
             @Override
             protected void onBindViewHolder(checkMemberViewHolder viewHolder, int position, final String model) {
-                viewHolder.setMember(model);
+                viewHolder.setMember(model.replace(",", "."));
                 viewHolder.mCheckBox.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -78,8 +78,8 @@ public class addGroup extends AppCompatActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkedMembers.size() < 1) {
-                    Toast.makeText(addGroup.this, "select at least 1 participant", Toast.LENGTH_SHORT).show();
+                if(checkedMembers.size() < 2) {
+                    Toast.makeText(addGroup.this, "Select at least 1 participant", Toast.LENGTH_SHORT).show();
                 }else {
                     Intent intent = new Intent(addGroup.this, setName.class);
                     intent.putExtra("checkedMembers", checkedMembers);

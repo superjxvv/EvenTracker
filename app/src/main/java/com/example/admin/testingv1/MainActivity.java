@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             ArrayList<String> members = new ArrayList<String>();
                             members.add(encodeUserEmail(firebaseAuth.getCurrentUser().getEmail()));
                             String groupID = myRef.child("groups").push().getKey();
-                            Group group = new Group(members, firebaseAuth.getCurrentUser().getEmail(), groupID);
+                            Group group = new Group(members, firebaseAuth.getCurrentUser().getEmail(), groupID, firebaseAuth.getCurrentUser().getEmail());
                             myRef.child("Groups").child(groupID).setValue(group);
                             myRef.child("Users").child(encodeUserEmail(firebaseAuth.getCurrentUser().getEmail())).child("Groups").child(groupID).setValue(groupID);
                             startActivity(intent);
