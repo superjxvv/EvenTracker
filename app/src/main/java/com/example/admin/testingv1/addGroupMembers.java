@@ -37,6 +37,7 @@ public class addGroupMembers extends AppCompatActivity {
     private ArrayList<String> checkedMembers;
     private Group group;
     private boolean isMember = false;
+    private String email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

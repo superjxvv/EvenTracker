@@ -2,6 +2,7 @@ package com.example.admin.testingv1;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,14 +11,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class groupDetailsLeader extends AppCompatActivity implements View.OnClickListener  {
 
@@ -32,6 +40,9 @@ public class groupDetailsLeader extends AppCompatActivity implements View.OnClic
     private FirebaseRecyclerAdapter<String, MemberViewHolder> recyclerAdapter;
     private String email;
     private Button editGroup;
+    private ArrayList<String> eventIDs;
+    private ArrayList<String> dates;
+    private DataSnapshot groupDate_;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,8 +102,9 @@ public class groupDetailsLeader extends AppCompatActivity implements View.OnClic
                 mRef.child("Users").child(encodeUserEmail(email)).child("Groups").child(group.getGroupID()).removeValue();
                 group.setLeader(decodeUserEmail(group.getMembers().get(0)));
                 //need to add deleting of user's events from groups>Events
+                deleteEvents(encodeUserEmail(email));
                 startActivity(intent);
-            } else {
+            } else { //group is deleted
                 Intent intent = new Intent(this, GroupList.class);
                 mRef.child("Groups").child(group.getGroupID()).removeValue();
                 mRef.child("Users").child(encodeUserEmail(email)).child("Groups").child(group.getGroupID()).removeValue();
@@ -112,6 +124,83 @@ public class groupDetailsLeader extends AppCompatActivity implements View.OnClic
             intent.putExtra("group", group);
             startActivity(intent);
         }
+    }
+
+    public void deleteEvents (String email) {
+        findEventIDs(email);
+        mRef.child("Groups").child(group.getGroupID()).child("Events").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Iterator<DataSnapshot> groupDate = snapshot.getChildren().iterator();
+                while (groupDate.hasNext()) {
+                    groupDate_ = groupDate.next();
+                    if (dates.contains(groupDate_.getValue(String.class))) {
+                        mRef.child("Groups").child(group.getGroupID()).child("Events").child(groupDate_.getValue(String.class)).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot snapshot) {
+                                Iterator<DataSnapshot> eventID = snapshot.getChildren().iterator();
+                                while (eventID.hasNext()) {
+                                    DataSnapshot eventID_ = eventID.next();
+                                    if (eventIDs.contains(eventID_.getValue(Event.class).getEventId())) {
+                                        mRef.child("Groups").child(group.getGroupID()).child("Events").child(groupDate_.getValue(String.class)).child(eventID_.getValue(Event.class).getEventId()).removeValue();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                Toast.makeText(groupDetailsLeader.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(groupDetailsLeader.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    public void findEventIDs (String email) {
+        findDates(email);
+        for (int i = 0; i < dates.size(); i++) {
+            mRef.child("Users").child(email).child("Events").child(dates.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    Iterator<DataSnapshot> eventID = snapshot.getChildren().iterator();
+                    while (eventID.hasNext()) {
+                        DataSnapshot eventID_ = eventID.next();
+                        eventIDs.add(eventID_.getValue(Event.class).getEventId());
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(groupDetailsLeader.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    public void findDates (String email) {
+        mRef.child("Users").child(email).child("Events").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Iterator<DataSnapshot> date = snapshot.getChildren().iterator();
+                while (date.hasNext()) {
+                    DataSnapshot date_ = date.next();
+                    dates.add(date_.getValue(String.class));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(groupDetailsLeader.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public String encodeUserEmail(String userEmail) {

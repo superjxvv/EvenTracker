@@ -81,9 +81,9 @@ public class setName extends AppCompatActivity {
                 groupDB = mRef.child("Groups");
                 groupID = groupDB.push().getKey();
                 Group group = new Group(participants, groupName.getText().toString().trim(), groupID, userEmail);
-                if(getAllDates(participants.size())){
-                    dates = makeUnique(dates);
-                }
+
+                getAllDates(participants.size());
+                dates = makeUnique(dates);
 
                 for(i=0; i<dates.size(); i++){
                     for(j=0; j<participants.size();j++){
