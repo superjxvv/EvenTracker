@@ -11,6 +11,24 @@ public class Event implements Parcelable {
     private String endDate;
     private String remarks = "";
     private String eventId;
+    private String user = "";
+    private Boolean isPrivate = false;
+
+    public Event(String title, String startTime, String endTime, String startDate, String endDate, String remarks, String eventId, String user, Boolean isPrivate) {
+        if(!title.equals("")){
+            this.title = title;
+        }
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        if(!remarks.equals("")){
+            this.remarks = remarks;
+        }
+        this.eventId = eventId;
+        this.user = user;
+        this.isPrivate = isPrivate;
+    }
 
     public Event(String title, String startTime, String endTime, String startDate, String endDate, String remarks, String eventId) {
         if(!title.equals("")){
@@ -30,6 +48,7 @@ public class Event implements Parcelable {
 
     }
 
+
     protected Event(Parcel in) {
         title = in.readString();
         startTime = in.readString();
@@ -38,6 +57,9 @@ public class Event implements Parcelable {
         endDate = in.readString();
         remarks = in.readString();
         eventId = in.readString();
+        user = in.readString();
+        byte tmpIsPrivate = in.readByte();
+        isPrivate = tmpIsPrivate == 0 ? null : tmpIsPrivate == 1;
     }
 
     public static final Creator<Event> CREATOR = new Creator<Event>() {
@@ -104,19 +126,37 @@ public class Event implements Parcelable {
         return eventId;
     }
 
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public Boolean getPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(Boolean aPrivate) {
+        isPrivate = aPrivate;
+    }
+
     @Override
     public int describeContents() {
         return 0;
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(title);
-        parcel.writeString(startTime);
-        parcel.writeString(endTime);
-        parcel.writeString(startDate);
-        parcel.writeString(endDate);
-        parcel.writeString(remarks);
-        parcel.writeString(eventId);
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(startTime);
+        dest.writeString(endTime);
+        dest.writeString(startDate);
+        dest.writeString(endDate);
+        dest.writeString(remarks);
+        dest.writeString(eventId);
+        dest.writeString(user);
+        dest.writeByte((byte) (isPrivate == null ? 0 : isPrivate ? 1 : 2));
     }
 }
