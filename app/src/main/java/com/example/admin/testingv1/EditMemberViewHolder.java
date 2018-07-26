@@ -5,13 +5,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MemberViewHolder extends RecyclerView.ViewHolder  {
+public class EditMemberViewHolder extends RecyclerView.ViewHolder  {
     View mView;
-    TextView isAdmin;
+    Button kickBtn;
 
-    public MemberViewHolder(View itemView) {
+    public EditMemberViewHolder(View itemView) {
         super(itemView);
         mView = itemView;
+        kickBtn = (Button) mView.findViewById(R.id.kickBtn);
     }
 
     public void setMember (String member_) {
@@ -19,8 +20,8 @@ public class MemberViewHolder extends RecyclerView.ViewHolder  {
         member.setText(member_);
     }
 
-    public void setAdmin (){
-        isAdmin = (TextView) mView.findViewById(R.id.isLeader);
-        isAdmin.setText("Admin");
+    public void kickMember (Group group, String member) {
+        group.removeMember(member);
     }
 }
+

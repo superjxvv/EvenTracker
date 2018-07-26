@@ -45,6 +45,7 @@ public class setName extends AppCompatActivity {
     private int i, j;
     private DataSnapshot event;
     private String groupID;
+    private ArrayList<String> participants;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,7 @@ public class setName extends AppCompatActivity {
         groupsRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         Intent incomingIntent = getIntent();
-        final ArrayList<String> participants = incomingIntent.getStringArrayListExtra("checkedMembers");
+        participants = incomingIntent.getStringArrayListExtra("checkedMembers");
         numParticipants.setText("Number of Participants: " + participants.size());
         ArrayList <String> decodeparticipants = new ArrayList<String>();
         for(int i=0; i<participants.size(); i++){
@@ -80,24 +81,8 @@ public class setName extends AppCompatActivity {
                 groupDB = mRef.child("Groups");
                 groupID = groupDB.push().getKey();
                 Group group = new Group(participants, groupName.getText().toString().trim(), groupID, userEmail);
-                for (int i = 0; i < participants.size(); i++) {
-                    mRef.child("Users").child(participants.get(i)).child("Groups").child(groupID).setValue(groupID);
-                    mRef.child("Users").child(participants.get(i)).child("Events").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            Iterator<DataSnapshot> values = snapshot.getChildren().iterator();
-                            while (values.hasNext()) {
-                                DataSnapshot value = values.next();
-                                dates.add(value.getKey());
-                            }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
 
+                getAllDates(participants.size());
                 dates = makeUnique(dates);
 
                 for(i=0; i<dates.size(); i++){
@@ -113,7 +98,8 @@ public class setName extends AppCompatActivity {
                                             @Override
                                             public void onDataChange(DataSnapshot snapshot) {
                                                 Event event_ = snapshot.getValue(Event.class);
-                                                groupDB.child(groupID).child("Events").child(dates.get(i)).child(event.getKey()).setValue(event_);
+                                                groupDB.child(groupID).child("Events").child(dates.get(i)).child(event_.getEventId()).setValue(event_);
+                                                groupDB.child(groupID).child("Events").child(dates.get(i)).child(event_.getEventId()).child("Emails").child(encodeUserEmail(userEmail)).setValue(encodeUserEmail(userEmail));
                                             }
                                             @Override
                                             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -134,6 +120,27 @@ public class setName extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    public boolean getAllDates (int num) {
+        for (int i = 0; i < num; i++) {
+            mRef.child("Users").child(participants.get(i)).child("Groups").child(groupID).setValue(groupID);
+            mRef.child("Users").child(participants.get(i)).child("Events").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    Iterator<DataSnapshot> values = snapshot.getChildren().iterator();
+                    while (values.hasNext()) {
+                        DataSnapshot value = values.next();
+                        dates.add(value.getKey());
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        return true;
     }
 
     public ArrayList makeUnique(ArrayList<String> list) {
