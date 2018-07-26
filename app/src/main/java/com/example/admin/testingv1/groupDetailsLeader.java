@@ -1,8 +1,8 @@
 package com.example.admin.testingv1;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,7 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-public class groupDetails extends AppCompatActivity implements View.OnClickListener {
+public class groupDetailsLeader extends AppCompatActivity implements View.OnClickListener  {
 
     private TextView groupName;
     private RecyclerView members;
@@ -31,14 +31,16 @@ public class groupDetails extends AppCompatActivity implements View.OnClickListe
     private String userID;
     private FirebaseRecyclerAdapter<String, MemberViewHolder> recyclerAdapter;
     private String email;
+    private Button editGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_details);
+        setContentView(R.layout.group_details_leader);
 
         groupName = (TextView) findViewById(R.id.Description);
         members = (RecyclerView) findViewById(R.id.members);
+        editGroup = (Button) findViewById(R.id.editGroupBtn);
         leaveGroup = (Button) findViewById(R.id.leaveGroup);
         backToGroupCalendar = (Button) findViewById(R.id.backToGroupCalendar);
         firebaseAuth = FirebaseAuth.getInstance();
@@ -58,26 +60,27 @@ public class groupDetails extends AppCompatActivity implements View.OnClickListe
         Query query = mRef.child("Groups").child(group.getGroupID()).child("members");
         FirebaseRecyclerOptions<String> firebaseRecyclerOptions = new FirebaseRecyclerOptions.Builder<String>().setQuery(query, String.class).build();
         recyclerAdapter =new FirebaseRecyclerAdapter<String, MemberViewHolder>
-            (firebaseRecyclerOptions) {
+                (firebaseRecyclerOptions) {
             @Override
-            public MemberViewHolder onCreateViewHolder (ViewGroup parent,int viewType){
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.member_info, parent, false);
-            return new MemberViewHolder(view);
+            public MemberViewHolder onCreateViewHolder (ViewGroup parent, int viewType){
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.member_info, parent, false);
+                return new MemberViewHolder(view);
             }
             @Override
             protected void onBindViewHolder ( final MemberViewHolder viewHolder, int position,
-            final String model){
-            viewHolder.setMember(decodeUserEmail(model));
-            if(group.getLeader().equals(decodeUserEmail(model))){
-                viewHolder.setAdmin();
+                                              final String model){
+                viewHolder.setMember(model);
+                if(group.getLeader().equals(decodeUserEmail(model))){
+                    viewHolder.setAdmin();
+                }
             }
-        }
-    };
+        };
 
         members.setAdapter(recyclerAdapter);
+        editGroup.setOnClickListener(this);
         backToGroupCalendar.setOnClickListener(this);
         leaveGroup.setOnClickListener(this);
-}
+    }
 
     @Override
     public void onClick(View view) {
@@ -85,12 +88,19 @@ public class groupDetails extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(this, GroupList.class);
             mRef.child("Groups").child(group.getGroupID()).child("members").child(encodeUserEmail(email)).removeValue();
             mRef.child("Users").child(encodeUserEmail(email)).child("Groups").child(group.getGroupID()).removeValue();
+            group.setLeader(decodeUserEmail(group.getMembers().get(0)));
             //need to add deleting of user's events from groups>Events
             startActivity(intent);
         }
 
         if (view == backToGroupCalendar){
-            Intent intent = new Intent (groupDetails.this, groupCalendar.class);
+            Intent intent = new Intent (groupDetailsLeader.this, groupCalendar.class);
+            intent.putExtra("group", group);
+            startActivity(intent);
+        }
+
+        if (view == editGroup) {
+            Intent intent = new Intent (groupDetailsLeader.this, editGroup.class);
             intent.putExtra("group", group);
             startActivity(intent);
         }
@@ -103,3 +113,4 @@ public class groupDetails extends AppCompatActivity implements View.OnClickListe
         return userEmail.replace(",", ".");
     }
 }
+

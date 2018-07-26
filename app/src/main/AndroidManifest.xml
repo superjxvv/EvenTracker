@@ -18,17 +18,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ProfileActivity" />
-        <activity
-            android:name=".LoginActivity" />
-        <activity
-            android:name=".addEvent" />
+        <activity android:name=".ProfileActivity" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".addEvent" />
         <activity
             android:name=".EventsToday"
             android:parentActivityName=".ProfileActivity" />
-        <activity
-            android:name=".EditEvent" />
+        <activity android:name=".EditEvent" />
         <activity
             android:name=".EmailFeedBack"
             android:parentActivityName=".ProfileActivity" />
@@ -53,24 +49,21 @@
         <activity
             android:name=".EventsTodayGroup"
             android:parentActivityName=".groupCalendar" />
-        <activity
-            android:name=".groupDetails" />
-        <activity
-            android:name=".MemberViewHolder" />
+        <activity android:name=".groupDetails" />
+        <activity android:name=".MemberViewHolder" />
         <activity
             android:name=".FriendList"
             android:parentActivityName=".ProfileActivity" />
         <activity
             android:name=".setName"
             android:parentActivityName=".addEventGroup"
-            android:windowSoftInputMode="adjustNothing"/>
-        <activity
-            android:name=".checkMemberViewHolder" />
+            android:windowSoftInputMode="adjustNothing" />
+        <activity android:name=".checkMemberViewHolder" />
         <activity
             android:name=".Notifications"
             android:parentActivityName=".ProfileActivity" />
-        <activity
-            android:name=".addEventGroup"></activity>
+        <activity android:name=".addEventGroup" />
+        <activity android:name=".editGroup"></activity>
     </application>
 
 </manifest>

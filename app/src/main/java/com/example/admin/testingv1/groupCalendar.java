@@ -10,11 +10,12 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-public class groupCalendar extends AppCompatActivity implements View.OnClickListener{
+public class groupCalendar extends AppCompatActivity implements View.OnClickListener {
     private CalendarView calendarView;
     private TextView groupName;
     private FirebaseAuth firebaseAuth;
     private Group group;
+    private String userEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +25,8 @@ public class groupCalendar extends AppCompatActivity implements View.OnClickList
         calendarView = (CalendarView) findViewById(R.id.groupCalenderView);
         groupName = (TextView) findViewById(R.id.Description);
         firebaseAuth = FirebaseAuth.getInstance();
+
+        userEmail = firebaseAuth.getCurrentUser().getEmail();
         Intent incomingIntent = getIntent();
         group = incomingIntent.getParcelableExtra("Group");
 
@@ -43,10 +46,16 @@ public class groupCalendar extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View view) {
-        if(view == groupName) {
-            Intent intent = new Intent(this, groupDetails.class);
-            intent.putExtra("group", group);
-            startActivity(intent);
+        if (view == groupName) {
+            if (!(group.getLeader().equals(userEmail))) {
+                Intent intent = new Intent(this, groupDetails.class);
+                intent.putExtra("group", group);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(this, groupDetailsLeader.class);
+                intent.putExtra("group", group);
+                startActivity(intent);
+            }
         }
     }
 }
