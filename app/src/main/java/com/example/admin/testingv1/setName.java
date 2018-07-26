@@ -42,10 +42,11 @@ public class setName extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private DatabaseReference groupDB;
     private ArrayList <String> dates = new ArrayList<String>();
-    private int i, j;
     private DataSnapshot event;
     private String groupID;
     private ArrayList<String> participants;
+    private Group group;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,52 +78,52 @@ public class setName extends AppCompatActivity {
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(setName.this, GroupList.class);
+                intent = new Intent(setName.this, GroupList.class);
                 groupDB = mRef.child("Groups");
                 groupID = groupDB.push().getKey();
-                Group group = new Group(participants, groupName.getText().toString().trim(), groupID, userEmail);
+                group = new Group(participants, groupName.getText().toString().trim(), groupID, userEmail);
 
-                getAllDates(participants.size());
-                dates = makeUnique(dates);
+                run(participants.size());
 
-                for(i=0; i<dates.size(); i++){
-                    for(j=0; j<participants.size();j++){
-                        mRef.child("Users").child(participants.get(j)).child("Events").child(dates.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot snapshot) {
-                                if (snapshot.getValue(Event.class) != null) { //event exist in this date
-                                    Iterator<DataSnapshot> events = snapshot.getChildren().iterator();
-                                    while (events.hasNext()) {
-                                        event = events.next();
-                                        mRef.child("Users").child(participants.get(j)).child("Events").child(dates.get(i)).child(event.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(DataSnapshot snapshot) {
-                                                Event event_ = snapshot.getValue(Event.class);
-                                                groupDB.child(groupID).child("Events").child(dates.get(i)).child(event_.getEventId()).setValue(event_);
-                                                groupDB.child(groupID).child("Events").child(dates.get(i)).child(event_.getEventId()).child("Emails").child(encodeUserEmail(userEmail)).setValue(encodeUserEmail(userEmail));
-                                            }
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                }
-                groupDB.child(groupID).setValue(group);
-                startActivity(intent);
+
+//                for(i=0; i<dates.size(); i++){
+//                    for(j=0; j<participants.size();j++){
+//                        mRef.child("Users").child(participants.get(j)).child("Events").child(dates.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
+//                            @Override
+//                            public void onDataChange(DataSnapshot snapshot) {
+//                                if (snapshot.getValue(Event.class) != null) { //event exist in this date
+//                                    Iterator<DataSnapshot> events = snapshot.getChildren().iterator();
+//                                    while (events.hasNext()) {
+//                                        event = events.next();
+//                                        mRef.child("Users").child(participants.get(j)).child("Events").child(dates.get(i)).child(event.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+//                                            @Override
+//                                            public void onDataChange(DataSnapshot snapshot) {
+//                                                Event event_ = snapshot.getValue(Event.class);
+//                                                groupDB.child(groupID).child("Events").child(dates.get(i)).child(event_.getEventId()).setValue(event_);
+//                                                groupDB.child(groupID).child("Events").child(dates.get(i)).child(event_.getEventId()).child("Emails").child(encodeUserEmail(userEmail)).setValue(encodeUserEmail(userEmail));
+//                                            }
+//                                            @Override
+//                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+//                                            }
+//                                        });
+//                                    }
+//                                }
+//                            }
+//                            @Override
+//                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//                    }
+//                }
+//                groupDB.child(groupID).setValue(group);
+//                startActivity(intent);
             }
         });
     }
 
-    public boolean getAllDates (int num) {
+    public boolean run(int num) {
         for (int i = 0; i < num; i++) {
             mRef.child("Users").child(participants.get(i)).child("Groups").child(groupID).setValue(groupID);
             mRef.child("Users").child(participants.get(i)).child("Events").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -133,6 +134,43 @@ public class setName extends AppCompatActivity {
                         DataSnapshot value = values.next();
                         dates.add(value.getKey());
                     }
+                    dates = makeUnique(dates);
+
+                    for(int k=0; k<dates.size(); k++){
+                        for(int j=0; j<participants.size();j++){
+                            final int finalJ = j;
+                            final int finalK = k;
+                            mRef.child("Users").child(participants.get(j)).child("Events").child(dates.get(k)).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot snapshot) {
+                                    if (snapshot.getValue(Event.class) != null) { //event exist in this date
+                                        Iterator<DataSnapshot> events = snapshot.getChildren().iterator();
+                                        while (events.hasNext()) {
+                                            event = events.next();
+                                            mRef.child("Users").child(participants.get(finalJ)).child("Events").child(dates.get(finalK)).child(event.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot snapshot) {
+                                                    Event event_ = snapshot.getValue(Event.class);
+                                                    groupDB.child(groupID).child("Events").child(dates.get(finalK)).child(event_.getEventId()).setValue(event_);
+                                                    groupDB.child(groupID).child("Events").child(dates.get(finalK)).child(event_.getEventId()).child("Emails").child(encodeUserEmail(userEmail)).setValue(encodeUserEmail(userEmail));
+                                                }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                    Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                    groupDB.child(groupID).setValue(group);
+                    startActivity(intent);
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
