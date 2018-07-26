@@ -85,12 +85,20 @@ public class groupDetailsLeader extends AppCompatActivity implements View.OnClic
     @Override
     public void onClick(View view) {
         if(view == leaveGroup) {
-            Intent intent = new Intent(this, GroupList.class);
-            mRef.child("Groups").child(group.getGroupID()).child("members").child(encodeUserEmail(email)).removeValue();
-            mRef.child("Users").child(encodeUserEmail(email)).child("Groups").child(group.getGroupID()).removeValue();
-            group.setLeader(decodeUserEmail(group.getMembers().get(0)));
-            //need to add deleting of user's events from groups>Events
-            startActivity(intent);
+            if(group.getSize()>=2) {
+                Intent intent = new Intent(this, GroupList.class);
+                mRef.child("Groups").child(group.getGroupID()).child("members").child(encodeUserEmail(email)).removeValue();
+                mRef.child("Users").child(encodeUserEmail(email)).child("Groups").child(group.getGroupID()).removeValue();
+                group.setLeader(decodeUserEmail(group.getMembers().get(0)));
+                //need to add deleting of user's events from groups>Events
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(this, GroupList.class);
+                mRef.child("Groups").child(group.getGroupID()).removeValue();
+                mRef.child("Users").child(encodeUserEmail(email)).child("Groups").child(group.getGroupID()).removeValue();
+                group.removeMember(decodeUserEmail(email));
+                startActivity(intent);
+            }
         }
 
         if (view == backToGroupCalendar){

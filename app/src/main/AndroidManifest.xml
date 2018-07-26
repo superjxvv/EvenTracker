@@ -63,7 +63,9 @@
             android:name=".Notifications"
             android:parentActivityName=".ProfileActivity" />
         <activity android:name=".addEventGroup" />
-        <activity android:name=".editGroup"></activity>
+        <activity android:name=".editGroup" />
+        <activity android:name=".chooseNewLeader" />
+        <activity android:name=".addGroupMembers"></activity>
     </application>
 
 </manifest>
