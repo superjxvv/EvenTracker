@@ -79,12 +79,17 @@ public class EventsTodayGroup extends AppCompatActivity implements View.OnClickL
                 }
                 @Override
                 protected void onBindViewHolder(GroupEventViewHolder viewHolder, int position, final Event model) {
-                    viewHolder.setTitle(model.getTitle());
+                    viewHolder.setTitle(model.getTitle(), model.getPrivate());
                     viewHolder.setStartTime(model.getStartTime() + " - ");
                     viewHolder.setEndTime(model.getEndTime());
                     viewHolder.setRemarks(model.getRemarks());
+                    if (model.getUser().equals("")) {
+                        viewHolder.setName("Group event.");
+                    } else {
+                        viewHolder.setName(model.getUser());
                     }
-                };
+                }
+        };
         myRecyclerView.setAdapter(recyclerAdapter);
     }
 

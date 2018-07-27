@@ -13,9 +13,13 @@ public class GroupEventViewHolder extends RecyclerView.ViewHolder {
         mView = itemView;
     }
 
-    public void setTitle(String title_) {
+    public void setTitle(String title_, Boolean privacy) {
         TextView title = (TextView) mView.findViewById(R.id.title);
-        title.setText(title_);
+        if(!privacy){
+            title.setText(title_);
+        } else {
+            title.setText("Private Event.");
+        }
     }
 
     public void setStartTime(String startTime_) {
@@ -31,5 +35,10 @@ public class GroupEventViewHolder extends RecyclerView.ViewHolder {
     public void setRemarks(String remarks_) {
         TextView remarks = (TextView) mView.findViewById(R.id.remarks);
         remarks.setText(remarks_);
+    }
+
+    public void setName(String email) {
+        TextView user = (TextView)mView.findViewById(R.id.userEmail);
+        user.setText(email+"'s Event.");
     }
 }
