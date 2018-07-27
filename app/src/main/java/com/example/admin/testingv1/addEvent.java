@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -70,6 +71,8 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
     private String end_date ;
     private String remarks_;
     private Event event;
+    private CheckBox mCheckBox;
+    private Boolean isPrivate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +83,8 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
         backToEventsToday = (Button) findViewById(R.id.backToEventsToday);
         addEventBtn = (Button) findViewById(R.id.addEvent);
         firebaseAuth = FirebaseAuth.getInstance();
+
+        mCheckBox = (CheckBox) findViewById(R.id.checkBoxPrivacy);
 
         Intent incomingIntent = getIntent();
         date = incomingIntent.getStringExtra("date");
@@ -138,6 +143,7 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
         endDate.setOnClickListener(this);
         backToEventsToday.setOnClickListener(this);
         addEventBtn.setOnClickListener(this);
+        mCheckBox.setOnClickListener(this);
 
         startDateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -234,6 +240,16 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
                     hour, minute, true);
             dialog.show();
         }
+
+        if(view == mCheckBox) {
+            boolean checked = ((CheckBox) view).isChecked();
+            if (checked) {
+                isPrivate = true;
+            } else {
+                isPrivate = false;
+            }
+        }
+
         if(view == addEventBtn) {
             Toast.makeText(addEvent.this, "Added Successfully!", Toast.LENGTH_SHORT).show();
             final String email = firebaseAuth.getCurrentUser().getEmail();
@@ -276,7 +292,7 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
         start_date = startDate.getText().toString().trim();
         end_date = endDate.getText().toString().trim();
         remarks_ = remarks.getText().toString().trim();
-        event = new Event(event_name, start_time, end_time, start_date, end_date, remarks_, eventId);
+        event = new Event(event_name, start_time, end_time, start_date, end_date, remarks_, eventId, email, isPrivate);
         while (numGroup>j){
             for (int i = 0; i < numDays; i++) {
                 int key = getKey(start_Date, i);
