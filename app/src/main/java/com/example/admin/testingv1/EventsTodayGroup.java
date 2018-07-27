@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -41,6 +42,7 @@ public class EventsTodayGroup extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_events_today_group);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         theDate = (TextView) findViewById(R.id.theDate);
         addEvent = (Button) findViewById(R.id.addEvent);
@@ -84,6 +86,20 @@ public class EventsTodayGroup extends AppCompatActivity implements View.OnClickL
                     }
                 };
         myRecyclerView.setAdapter(recyclerAdapter);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                Intent intent = new Intent(EventsTodayGroup.this, groupCalendar.class);
+                intent.putExtra("group", group);
+                startActivity(intent);
+                return true;
+                default:
+                    return super.onOptionsItemSelected(item);
+        }
+
     }
 
     @Override
