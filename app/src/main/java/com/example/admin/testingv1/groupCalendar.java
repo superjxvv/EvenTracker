@@ -28,7 +28,7 @@ public class groupCalendar extends AppCompatActivity implements View.OnClickList
 
         userEmail = firebaseAuth.getCurrentUser().getEmail();
         Intent incomingIntent = getIntent();
-        group = incomingIntent.getParcelableExtra("Group");
+        group = incomingIntent.getParcelableExtra("group");
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -52,7 +52,7 @@ public class groupCalendar extends AppCompatActivity implements View.OnClickList
                 intent.putExtra("group", group);
                 startActivity(intent);
             } else {
-                Intent intent = new Intent(this, groupDetailsLeader.class);
+                Intent intent = new Intent(this, GroupDetailsLeader_.class);
                 intent.putExtra("group", group);
                 startActivity(intent);
             }

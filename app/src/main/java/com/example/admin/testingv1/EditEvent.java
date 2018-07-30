@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -35,7 +36,6 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
 
     private static final String TAG = addEvent.class.getSimpleName();
     private TextView theDate;
-    private Button backToEventsToday;
     private FirebaseAuth firebaseAuth;
     private TextView startDate;
     private TextView endDate;
@@ -51,7 +51,6 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
     private Button delete;
     private EditText eventName;
     private EditText remarks;
-    private String userId;
     private Event event;
     private DatabaseReference mRef;
     private ArrayList<String> groups_ = new ArrayList<String>();
@@ -70,19 +69,22 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
     private String end_date;
     private String remarks_;
     private Event event2;
+    private CheckBox mCheckBox;
+    private Boolean isPrivate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_event);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         theDate = (TextView) findViewById(R.id.theDate);
-        backToEventsToday = (Button) findViewById(R.id.backToEventsToday);
         save = (Button) findViewById(R.id.save);
         delete = (Button) findViewById(R.id.delete);
 
         firebaseAuth = FirebaseAuth.getInstance();
-        userId = firebaseAuth.getCurrentUser().getUid();
+        mCheckBox = (CheckBox) findViewById(R.id.checkBoxPrivacy);
 
         Intent incomingIntent = getIntent();
         date = incomingIntent.getStringExtra("date");
@@ -138,7 +140,6 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
         endTime.setOnClickListener(this);
         startDate.setOnClickListener(this);
         endDate.setOnClickListener(this);
-        backToEventsToday.setOnClickListener(this);
         save.setOnClickListener(this);
         delete.setOnClickListener(this);
 
@@ -181,13 +182,6 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
     }
 
     public void onClick(View view) {
-        if (view == backToEventsToday) {
-            //will open login
-            Intent intent = new Intent(EditEvent.this, EventsToday.class);
-            intent.putExtra("date", date);
-            startActivity(intent);
-        }
-
         if (view == startDate) {
             Calendar cal = Calendar.getInstance();
             int year = cal.get(Calendar.YEAR);
@@ -248,6 +242,14 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
             intent.putExtra("date", date);
             startActivity(intent);
         }
+        if(view == mCheckBox) {
+            boolean checked = ((CheckBox) view).isChecked();
+            if (checked) {
+                isPrivate = true;
+            } else {
+                isPrivate = false;
+            }
+        }
     }
 
     private void saveEvent() {
@@ -277,20 +279,21 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
                 }
                 numGroups = groups_.size();
                 int numDays = getNumDays(old_start_Date, old_end_Date);
-                int j = 0;
+                int j = -1;
                 while (numGroups > j) {
                     for (int i = 0; i < numDays; i++) {
                         key = getKey(old_start_Date, i);
                         FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email))
                                 .child("Events").child(Integer.toString(key)).child(eventId).removeValue();
-                        mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key))
-                                .child(eventId).child("Emails").child(encodeUserEmail(email)).removeValue();
+                        if(j>=0) {
+                            mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key))
+                                    .child(eventId).child("Emails").child(encodeUserEmail(email)).removeValue();
+                        }
                     }
                     j++;
                 }
                 numDays = getNumDays(start_Date, end_Date);
-                numGroups = groups_.size();
-                j = 0;
+                j = -1;
                 eventDB = FirebaseDatabase.getInstance().getReference().child("Users")
                         .child(encodeUserEmail(email)).child("Events");
                 eventId = event.getEventId();
@@ -300,18 +303,20 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
                 start_date = startDate.getText().toString().trim();
                 end_date = endDate.getText().toString().trim();
                 remarks_ = remarks.getText().toString().trim();
-                event2 = new Event(event_name, start_time, end_time, start_date, end_date, remarks_, eventId);
+                event2 = new Event(event_name, start_time, end_time, start_date, end_date, remarks_, eventId, email, isPrivate);
                 while (numGroups > j) {
                     for (int i = 0; i < numDays; i++) {
                         int key = getKey(start_Date, i);
                         FirebaseUser user = firebaseAuth.getCurrentUser();
                         String email = user.getEmail();
-                        if(j == 0){
+                        if (j == -1) {
                             eventDB.child(Integer.toString(key)).child(eventId).setValue(event2);
                         }
-                        mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key)).child(eventId).setValue(event2);
-                        mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key))
-                                .child(eventId).child("Emails").child(encodeUserEmail(email)).setValue(encodeUserEmail(email));
+                        if (j >= 0) {
+                            mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key)).child(eventId).setValue(event2);
+                            mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key))
+                                    .child(eventId).child("Emails").child(encodeUserEmail(email)).setValue(encodeUserEmail(email));
+                        }
                     }
                     j++;
                 }
@@ -387,17 +392,19 @@ public class EditEvent extends AppCompatActivity implements View.OnClickListener
                 }
                 numGroups = groups_.size();
                 int numDays = getNumDays(old_start_Date, old_end_Date);
-                int j = 0;
+                int j = -1;
                 while (numGroups > j) {
                     for (int i = 0; i < numDays; i++) {
                         key = getKey(old_start_Date, i);
-                        if(j == 1) {
+                        if (j == -1) {
                             FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email))
                                     .child("Events").child(Integer.toString(key)).child(eventId).removeValue();
                         }
-                        mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key))
-                                .child(eventId).child("Emails").child(encodeUserEmail(email)).removeValue();
-                        checkMembers(groups_.get(j), key);
+                        if (j >= 0) {
+                            mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key))
+                                    .child(eventId).child("Emails").child(encodeUserEmail(email)).removeValue();
+                            checkMembers(groups_.get(j), key);
+                        }
                     }
                     j++;
                 }

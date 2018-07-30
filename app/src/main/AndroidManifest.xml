@@ -18,13 +18,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ProfileActivity" />
+        <activity
+            android:name=".ProfileActivity"
+            android:parentActivityName=".ProfileActivity"/>
         <activity android:name=".LoginActivity" />
-        <activity android:name=".addEvent" />
+        <activity
+            android:name=".addEvent"
+            android:parentActivityName=".EventsToday"/>
         <activity
             android:name=".EventsToday"
             android:parentActivityName=".ProfileActivity" />
-        <activity android:name=".EditEvent" />
+        <activity android:name=".EditEvent"
+            android:parentActivityName=".EditEvent"/>
         <activity
             android:name=".EmailFeedBack"
             android:parentActivityName=".ProfileActivity" />
@@ -65,7 +70,8 @@
         <activity android:name=".addEventGroup" />
         <activity android:name=".editGroup" />
         <activity android:name=".chooseNewLeader" />
-        <activity android:name=".addGroupMembers"></activity>
+        <activity android:name=".addGroupMembers" />
+        <activity android:name=".GroupDetailsLeader_"></activity>
     </application>
 
 </manifest>

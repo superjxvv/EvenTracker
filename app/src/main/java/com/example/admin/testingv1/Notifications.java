@@ -56,6 +56,7 @@ public class Notifications extends AppCompatActivity {
                         public void onClick(View view) {
                             Intent intent = new Intent(Notifications.this, ProfileActivity.class);
                             intent.putExtra("userEmail", requester);
+                            mRef.child("Users").child(encodeUserEmail(userEmail)).child("AcceptedRequests").child(model).removeValue();
                             startActivity(intent);
                             }
                         });

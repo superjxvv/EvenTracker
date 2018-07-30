@@ -69,7 +69,7 @@ public class GroupList extends AppCompatActivity implements View.OnClickListener
                             @Override
                             public void onClick(View view) {
                                 Intent intent = new Intent(GroupList.this, groupCalendar.class);
-                                intent.putExtra("Group", group);
+                                intent.putExtra("group", group);
                                 startActivity(intent);
                             }
                         });

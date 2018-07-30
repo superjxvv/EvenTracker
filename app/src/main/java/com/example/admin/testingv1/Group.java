@@ -83,6 +83,8 @@ public class Group implements Parcelable{
         leader = leader2;
     }
 
+    public int getIndex(String email) { return members.indexOf(email);}
+
     @Override
     public int describeContents() {
         return 0;

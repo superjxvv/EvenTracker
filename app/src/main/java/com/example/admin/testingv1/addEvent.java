@@ -42,7 +42,6 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
 
     private static final String TAG = addEvent.class.getSimpleName();
     private TextView theDate;
-    private Button backToEventsToday;
     private FirebaseAuth firebaseAuth;
     private TextView startDate;
     private TextView endDate;
@@ -79,8 +78,9 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         theDate = (TextView) findViewById(R.id.theDate);
-        backToEventsToday = (Button) findViewById(R.id.backToEventsToday);
         addEventBtn = (Button) findViewById(R.id.addEvent);
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -141,7 +141,6 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
         endTime.setOnClickListener(this);
         startDate.setOnClickListener(this);
         endDate.setOnClickListener(this);
-        backToEventsToday.setOnClickListener(this);
         addEventBtn.setOnClickListener(this);
         mCheckBox.setOnClickListener(this);
 
@@ -184,12 +183,6 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
     }
 
     public void onClick(View view) {
-        if(view == backToEventsToday){
-            //will open login
-            Intent intent = new Intent(addEvent.this, EventsToday.class);
-            intent.putExtra("date", date);
-            startActivity(intent);
-        }
         if(view == startDate) {
             Calendar cal = Calendar.getInstance();
             int year = cal.get(Calendar.YEAR);
@@ -282,7 +275,7 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
     public void addEventToDatabase(String email){
         int numGroup = groups_.size();
         int numDays = (end_Date - start_Date)+1;
-        int j = 0;
+        int j = -1;
         eventDB = FirebaseDatabase.getInstance().getReference().child("Users").
                 child(encodeUserEmail(email)).child("Events");
         eventId = eventDB.push().getKey();
@@ -296,12 +289,14 @@ public class addEvent extends AppCompatActivity implements View.OnClickListener 
         while (numGroup>j){
             for (int i = 0; i < numDays; i++) {
                 int key = getKey(start_Date, i);
-                if(j == 0) {
+                if (j == -1) {
                     eventDB.child(Integer.toString(key)).child(eventId).setValue(event);
                 }
-                mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key)).child(eventId).setValue(event);
+                if (j >= 0) {
+                    mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key)).child(eventId).setValue(event);
                 mRef.child("Groups").child(groups_.get(j)).child("Events").child(Integer.toString(key))
                         .child(eventId).child("Emails").child(encodeUserEmail(email)).setValue(encodeUserEmail(email));
+                }
             }
             j++;
         }

@@ -6,28 +6,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class groupDetails extends AppCompatActivity implements View.OnClickListener {
+public class GroupDetailsLeader_ extends AppCompatActivity  implements View.OnClickListener  {
 
     private TextView groupName;
     private RecyclerView members;
@@ -36,32 +31,32 @@ public class groupDetails extends AppCompatActivity implements View.OnClickListe
     private Group group;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mRef;
-    private String userID;
+    private String email;
+    private Button editGroup;
+    private ArrayList<String> eventIDs = new ArrayList<String>();
+    private ArrayList<String> dates = new ArrayList<String>();
+    private DataSnapshot groupDate_;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
-    private String email;
-    private ArrayList<String> eventIDs;
-    private ArrayList<String> dates;
-    private DataSnapshot groupDate_;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_details);
+        setContentView(R.layout.activity_group_details_leader_);
 
         groupName = (TextView) findViewById(R.id.Description);
         members = (RecyclerView) findViewById(R.id.members);
+        editGroup = (Button) findViewById(R.id.editGroupBtn);
         leaveGroup = (Button) findViewById(R.id.leaveGroup);
         backToGroupCalendar = (Button) findViewById(R.id.backToGroupCalendar);
         firebaseAuth = FirebaseAuth.getInstance();
-        userID = firebaseAuth.getCurrentUser().getUid();
         mRef = FirebaseDatabase.getInstance().getReference();
-        mLayoutManager = new LinearLayoutManager(this);
 
         Intent incomingIntent = getIntent();
         group = incomingIntent.getParcelableExtra("group");
         groupName.setText(group.getGroupName());
         members.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
         FirebaseUser user = firebaseAuth.getCurrentUser();
         email = user.getEmail();
 
@@ -69,15 +64,18 @@ public class groupDetails extends AppCompatActivity implements View.OnClickListe
         members.setLayoutManager(mLayoutManager);
         members.setAdapter(mAdapter);
 
+        editGroup.setOnClickListener(this);
         backToGroupCalendar.setOnClickListener(this);
         leaveGroup.setOnClickListener(this);
-}
+    }
 
     @Override
     public void onClick(View view) {
         if(view == leaveGroup) {
-            if (group.getSize() > 1) {
+            if(group.getSize()>=2) {
                 Intent intent = new Intent(this, GroupList.class);
+                group.removeMember(encodeUserEmail(group.getLeader()));
+                group.setLeader(decodeUserEmail(group.getMembers().get(0)));
 
                 mRef.child("Groups").child(group.getGroupID()).child("members").addValueEventListener(new ValueEventListener() {
                     @Override
@@ -93,9 +91,11 @@ public class groupDetails extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Toast.makeText(groupDetails.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GroupDetailsLeader_.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+
+                mRef.child("Groups").child(group.getGroupID()).child("leader").setValue(decodeUserEmail(group.getMembers().get(0)));
 
                 mRef.child("Groups").child(group.getGroupID()).child("size").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -107,18 +107,30 @@ public class groupDetails extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Toast.makeText(groupDetails.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GroupDetailsLeader_.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
                 mRef.child("Users").child(encodeUserEmail(email)).child("Groups").child(group.getGroupID()).removeValue();
                 //need to add deleting of user's events from groups>Events
                 deleteEvents(encodeUserEmail(email));
                 startActivity(intent);
+            } else { //group is deleted
+                Intent intent = new Intent(this, GroupList.class);
+                mRef.child("Groups").child(group.getGroupID()).removeValue();
+                mRef.child("Users").child(encodeUserEmail(email)).child("Groups").child(group.getGroupID()).removeValue();
+                group.removeMember(decodeUserEmail(email));
+                startActivity(intent);
             }
         }
 
         if (view == backToGroupCalendar){
-            Intent intent = new Intent (groupDetails.this, groupCalendar.class);
+            Intent intent = new Intent (GroupDetailsLeader_.this, groupCalendar.class);
+            intent.putExtra("group", group);
+            startActivity(intent);
+        }
+
+        if (view == editGroup) {
+            Intent intent = new Intent (GroupDetailsLeader_.this, editGroup.class);
             intent.putExtra("group", group);
             startActivity(intent);
         }
@@ -148,7 +160,7 @@ public class groupDetails extends AppCompatActivity implements View.OnClickListe
                             }
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
-                                Toast.makeText(groupDetails.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(GroupDetailsLeader_.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -157,7 +169,7 @@ public class groupDetails extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(groupDetails.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupDetailsLeader_.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -184,14 +196,14 @@ public class groupDetails extends AppCompatActivity implements View.OnClickListe
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Toast.makeText(groupDetails.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GroupDetailsLeader_.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(groupDetails.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupDetailsLeader_.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -208,7 +220,7 @@ public class groupDetails extends AppCompatActivity implements View.OnClickListe
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(groupDetails.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupDetailsLeader_.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

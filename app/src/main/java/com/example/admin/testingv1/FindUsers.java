@@ -58,6 +58,7 @@ public class FindUsers extends AppCompatActivity implements View.OnClickListener
                     if (snapshot.getValue() != null) {
                         //user exists
                         userFound.setText(decodeUserEmail(email));
+                        userFound.setBackgroundColor(0xFF0000);
                         Toast.makeText(FindUsers.this, "User found!", Toast.LENGTH_SHORT).show();
                     } else {
                         //user does not exist

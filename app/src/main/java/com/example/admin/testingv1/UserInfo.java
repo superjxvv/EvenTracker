@@ -28,7 +28,7 @@ public class UserInfo extends AppCompatActivity {
     private String userEmail_;
     private DatabaseReference myRef;
     private TextView email_;
-    private boolean friend;
+    private boolean calenderRequested = false;
     private Boolean requested = false;
 
     @Override
@@ -51,7 +51,7 @@ public class UserInfo extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         myRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        email_.setText(email);
+        email_.setText(decodeUserEmail(email));
         isFriend ();
 
     }
@@ -61,6 +61,7 @@ public class UserInfo extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.getValue() != null) {
+                    alreadyRequest();
                     requestBtn.setText("Send request to view calendar");
                     unfriendBtn.setText("Unfriend");
                     unfriendBtn.setOnClickListener(new View.OnClickListener() {
@@ -89,10 +90,15 @@ public class UserInfo extends AppCompatActivity {
                                 Toast.makeText(UserInfo.this, "Already sent request.", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            String requestId = myRef.child(encodeUserEmail(email)).child("Request").push().getKey();
-                            Request request = new Request (userEmail_, "ViewCalendarRequest", requestId);
-                            myRef.child(encodeUserEmail(email)).child("Request").child(requestId).setValue(request);
-                            Toast.makeText(UserInfo.this, "Request sent!", Toast.LENGTH_SHORT).show();
+                            alreadyRequest();
+                            if (!requested) {
+                                String requestId = myRef.child(encodeUserEmail(email)).child("Request").push().getKey();
+                                Request request = new Request(userEmail_, "ViewCalendarRequest", requestId);
+                                myRef.child(encodeUserEmail(email)).child("Request").child(requestId).setValue(request);
+                                Toast.makeText(UserInfo.this, "Request sent!", Toast.LENGTH_SHORT).show();
+                            }else{
+                                Toast.makeText(UserInfo.this, "Already sent request.", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 });

@@ -7,15 +7,6 @@
     tools:context=".addEvent"
     tools:layout_editor_absoluteY="81dp">
 
-    <Button
-        android:id="@+id/backToEventsToday"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
-        android:text="Back to Events"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/theDate"

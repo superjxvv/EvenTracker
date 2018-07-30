@@ -32,18 +32,14 @@ public class editGroup extends AppCompatActivity implements View.OnClickListener
     private FirebaseAuth firebaseAuth;
     private RecyclerView members;
     private DatabaseReference mRef;
-    private String userEmail;
-    private int numMembers;
     private Group group;
-    private Query query;
     private FirebaseRecyclerAdapter<String, EditMemberViewHolder> recyclerAdapter;
     private TextView groupName;
     private Button addMembers;
-    private Button leaveGroup;
     private Button backBtn;
     private String email;
-    private ArrayList<String> eventIDs;
-    private ArrayList<String> dates;
+    private ArrayList<String> eventIDs = new ArrayList<String>();
+    private ArrayList<String> dates = new ArrayList<String>();
     private DataSnapshot groupDate_;
 
     @Override
@@ -52,7 +48,6 @@ public class editGroup extends AppCompatActivity implements View.OnClickListener
         setContentView(R.layout.activity_edit_group);
         groupName = (TextView) findViewById(R.id.groupName);
         members = (RecyclerView) findViewById(R.id.recyclerView);
-        leaveGroup = (Button) findViewById(R.id.leaveBtn);
         backBtn = (Button) findViewById(R.id.BackBtn);
         firebaseAuth = FirebaseAuth.getInstance();
         addMembers = (Button) findViewById(R.id.AddBtn);
@@ -98,40 +93,11 @@ public class editGroup extends AppCompatActivity implements View.OnClickListener
 
         members.setAdapter(recyclerAdapter);
         backBtn.setOnClickListener(this);
-        leaveGroup.setOnClickListener(this);
         addMembers.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        if (view == leaveGroup) {
-            if (group.getSize() > 2) {
-                Intent intent = new Intent(this, chooseNewLeader.class);
-                mRef.child("Groups").child(group.getGroupID()).child("members").child(encodeUserEmail(email)).removeValue();
-                mRef.child("Users").child(encodeUserEmail(email)).child("Groups").child(group.getGroupID()).removeValue();
-                group.removeMember(decodeUserEmail(email));
-                intent.putExtra("group", group);
-                //need to add deleting of user's events from groups>Events
-                deleteEvents(encodeUserEmail(email));
-                startActivity(intent);
-            } else if (group.getSize() == 1) {
-                Intent intent = new Intent(this, GroupList.class);
-                mRef.child("Groups").child(group.getGroupID()).removeValue();
-                mRef.child("Users").child(encodeUserEmail(email)).child("Groups").child(group.getGroupID()).removeValue();
-                group.removeMember(decodeUserEmail(email));
-                startActivity(intent);
-            } else {
-                Intent intent = new Intent(this, GroupList.class);
-                mRef.child("Groups").child(group.getGroupID()).child("members").child(encodeUserEmail(email)).removeValue();
-                mRef.child("Users").child(encodeUserEmail(email)).child("Groups").child(group.getGroupID()).removeValue();
-                group.removeMember(decodeUserEmail(email));
-                group.setLeader(decodeUserEmail(group.getMembers().get(0)));
-                //need to add deleting of user's events from groups>Events
-                deleteEvents(encodeUserEmail(email));
-                startActivity(intent);
-            }
-        }
-
         if (view == backBtn) {
             Intent intent = new Intent(editGroup.this, groupCalendar.class);
             intent.putExtra("group", group);

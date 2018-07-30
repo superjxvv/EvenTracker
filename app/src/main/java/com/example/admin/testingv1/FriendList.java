@@ -55,7 +55,7 @@ public class FriendList extends AppCompatActivity {
             }
             @Override
             protected void onBindViewHolder(MemberViewHolder viewHolder, int position, final String model) {
-                viewHolder.setMember(model);
+                viewHolder.setMember(decodeUserEmail(model));
                 viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

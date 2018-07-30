@@ -96,7 +96,8 @@ public class Request implements Parcelable{
         requestID = ID;
     }
 
-    public Request (String userID, String groupName, String eventName, String startTime, String endTime, String startDate, String endDate, String ID, String remarks_, String eventId){
+    public Request (String userID, String groupName, String eventName, String startTime, String endTime,
+                    String startDate, String endDate, String ID, String remarks_, String eventId){
         this.requester = userID;
         requestID = ID;
         this.groupName = groupName;

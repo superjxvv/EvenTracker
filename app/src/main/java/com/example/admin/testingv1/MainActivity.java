@@ -89,12 +89,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             String userId = firebaseAuth.getCurrentUser().getUid();
                             User user = new User(userId);
                             myRef.child("Users").child(encodeUserEmail(email)).setValue(user);
-                            ArrayList<String> members = new ArrayList<String>();
-                            members.add(encodeUserEmail(firebaseAuth.getCurrentUser().getEmail()));
-                            String groupID = myRef.child("groups").push().getKey();
-                            Group group = new Group(members, firebaseAuth.getCurrentUser().getEmail(), groupID, firebaseAuth.getCurrentUser().getEmail());
-                            myRef.child("Groups").child(groupID).setValue(group);
-                            myRef.child("Users").child(encodeUserEmail(firebaseAuth.getCurrentUser().getEmail())).child("Groups").child(groupID).setValue(groupID);
+//                            ArrayList<String> members = new ArrayList<String>();
+//                            members.add(encodeUserEmail(firebaseAuth.getCurrentUser().getEmail()));
+//                            String groupID = myRef.child("groups").push().getKey();
+//                            Group group = new Group(members, firebaseAuth.getCurrentUser().getEmail(), groupID, firebaseAuth.getCurrentUser().getEmail());
+//                            myRef.child("Groups").child(groupID).setValue(group);
+//                            myRef.child("Users").child(encodeUserEmail(firebaseAuth.getCurrentUser().getEmail())).child("Groups").child(groupID).setValue(groupID);
                             startActivity(intent);
                         }else{
                             Toast.makeText(MainActivity.this, "Could not register, please try again.", Toast.LENGTH_SHORT).show();

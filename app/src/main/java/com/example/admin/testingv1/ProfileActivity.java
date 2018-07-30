@@ -40,8 +40,10 @@ public class ProfileActivity extends AppCompatActivity {
         textViewUserEmail = (TextView) findViewById(R.id.textViewUserEmail);
         if(userEmail!=null){
             textViewUserEmail.setText(userEmail+"'s Calendar.");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         } else {
             textViewUserEmail.setText("Welcome " + user.getEmail());
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
         calendarView = (CalendarView) findViewById(R.id.calendarView);
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -83,6 +85,8 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(new Intent(this, EmailFeedBack.class));
         }else if(item.getItemId()==R.id.requests) {
             startActivity(new Intent(this, RequestList.class));
+        }else if(item.getItemId()==R.id.home) {
+            startActivity(new Intent(this, ProfileActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
