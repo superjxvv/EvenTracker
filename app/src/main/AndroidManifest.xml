@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.admin.testingv1">
+    package="com.example.admin.eventracker">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name="com.example.admin.eventracker.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,59 +19,59 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ProfileActivity"
-            android:parentActivityName=".ProfileActivity"/>
-        <activity android:name=".LoginActivity" />
+            android:name="com.example.admin.eventracker.ProfileActivity"
+            android:parentActivityName="com.example.admin.eventracker.ProfileActivity"/>
+        <activity android:name="com.example.admin.eventracker.LoginActivity" />
         <activity
-            android:name=".addEvent"
-            android:parentActivityName=".EventsToday"/>
+            android:name="com.example.admin.eventracker.addEvent"
+            android:parentActivityName="com.example.admin.eventracker.EventsToday"/>
         <activity
-            android:name=".EventsToday"
-            android:parentActivityName=".ProfileActivity" />
-        <activity android:name=".EditEvent"
-            android:parentActivityName=".EditEvent"/>
+            android:name="com.example.admin.eventracker.EventsToday"
+            android:parentActivityName="com.example.admin.eventracker.ProfileActivity" />
+        <activity android:name="com.example.admin.eventracker.EditEvent"
+            android:parentActivityName="com.example.admin.eventracker.EditEvent"/>
         <activity
-            android:name=".EmailFeedBack"
-            android:parentActivityName=".ProfileActivity" />
+            android:name="com.example.admin.eventracker.EmailFeedBack"
+            android:parentActivityName="com.example.admin.eventracker.ProfileActivity" />
         <activity
-            android:name=".GroupList"
-            android:parentActivityName=".ProfileActivity" />
+            android:name="com.example.admin.eventracker.GroupList"
+            android:parentActivityName="com.example.admin.eventracker.ProfileActivity" />
         <activity
-            android:name=".groupCalendar"
-            android:parentActivityName=".GroupList" />
+            android:name="com.example.admin.eventracker.groupCalendar"
+            android:parentActivityName="com.example.admin.eventracker.GroupList" />
         <activity
-            android:name=".addGroup"
-            android:parentActivityName=".GroupList" />
+            android:name="com.example.admin.eventracker.addGroup"
+            android:parentActivityName="com.example.admin.eventracker.GroupList" />
         <activity
-            android:name=".FindUsers"
-            android:parentActivityName=".FriendList" />
+            android:name="com.example.admin.eventracker.FindUsers"
+            android:parentActivityName="com.example.admin.eventracker.FriendList" />
         <activity
-            android:name=".UserInfo"
-            android:parentActivityName=".FindUsers" />
+            android:name="com.example.admin.eventracker.UserInfo"
+            android:parentActivityName="com.example.admin.eventracker.FindUsers" />
         <activity
-            android:name=".RequestList"
-            android:parentActivityName=".ProfileActivity" />
+            android:name="com.example.admin.eventracker.RequestList"
+            android:parentActivityName="com.example.admin.eventracker.ProfileActivity" />
         <activity
-            android:name=".EventsTodayGroup"
-            android:parentActivityName=".groupCalendar" />
-        <activity android:name=".groupDetails" />
-        <activity android:name=".MemberViewHolder" />
+            android:name="com.example.admin.eventracker.EventsTodayGroup"
+            android:parentActivityName="com.example.admin.eventracker.groupCalendar" />
+        <activity android:name="com.example.admin.eventracker.groupDetails" />
+        <activity android:name="com.example.admin.eventracker.MemberViewHolder" />
         <activity
-            android:name=".FriendList"
-            android:parentActivityName=".ProfileActivity" />
+            android:name="com.example.admin.eventracker.FriendList"
+            android:parentActivityName="com.example.admin.eventracker.ProfileActivity" />
         <activity
-            android:name=".setName"
-            android:parentActivityName=".addEventGroup"
+            android:name="com.example.admin.eventracker.setName"
+            android:parentActivityName="com.example.admin.eventracker.addEventGroup"
             android:windowSoftInputMode="adjustNothing" />
-        <activity android:name=".checkMemberViewHolder" />
+        <activity android:name="com.example.admin.eventracker.checkMemberViewHolder" />
         <activity
-            android:name=".Notifications"
-            android:parentActivityName=".ProfileActivity" />
-        <activity android:name=".addEventGroup" />
-        <activity android:name=".editGroup" />
-        <activity android:name=".chooseNewLeader" />
-        <activity android:name=".addGroupMembers" />
-        <activity android:name=".GroupDetailsLeader_"></activity>
+            android:name="com.example.admin.eventracker.Notifications"
+            android:parentActivityName="com.example.admin.eventracker.ProfileActivity" />
+        <activity android:name="com.example.admin.eventracker.addEventGroup" />
+        <activity android:name="com.example.admin.eventracker.editGroup" />
+        <activity android:name="com.example.admin.eventracker.chooseNewLeader" />
+        <activity android:name="com.example.admin.eventracker.addGroupMembers" />
+        <activity android:name="com.example.admin.eventracker.GroupDetailsLeader_"></activity>
     </application>
 
 </manifest>
