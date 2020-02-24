@@ -14,9 +14,10 @@
         android:layout_marginTop="8dp"
         android:text="Large Text"
         app:layout_constraintBottom_toTopOf="@+id/calendarView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.382"
-        tools:layout_editor_absoluteX="0dp" />
+        app:layout_constraintVertical_bias="0.382" />
 
     <CalendarView
         android:id="@+id/calendarView"

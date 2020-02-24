@@ -37,4 +37,19 @@
     <string name="number_of_participants">Number of Participants: %1$d</string>
     <string name="default_end_time">09:00</string>
     <string name="default_start_time">08:00</string>
+    <string name="description">Description</string>
+    <string name="leave_group">Leave group</string>
+    <string name="back">Back</string>
+    <string name="group_list">Group list</string>
+    <string name="add_group">add group</string>
+    <string name="enter_your_email">Enter your email</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="sign_up">Sign up</string>
+    <string name="already_a_user_log_in_here">Already a user? Log in here!</string>
+    <string name="request_list">Request List</string>
+    <string name="type_group_subject_here">Type Group Subject Here&#8230;</string>
+    <string name="user_email">UserEmail</string>
+    <string name="request_btn">requestBtn</string>
+    <string name="accept">Accept</string>
+    <string name="reject">Reject</string>
 </resources>
