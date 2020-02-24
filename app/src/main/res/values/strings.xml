@@ -34,4 +34,7 @@
     <string name="user_found">User Found</string>
     <string name="friends_list">Friends list</string>
     <string name="click_on_the_username_to_access_their_information">click on the username to access their information</string>
+    <string name="number_of_participants">Number of Participants: %1$d</string>
+    <string name="default_end_time">09:00</string>
+    <string name="default_start_time">08:00</string>
 </resources>

@@ -20,22 +20,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Objects;
 
 public class setName extends AppCompatActivity {
 
     private EditText groupName;
-    private TextView numParticipants;
-    private FloatingActionButton done;
-    private RecyclerView groupsRecyclerView;
-    private FirebaseAuth firebaseAuth;
     private DatabaseReference mRef;
-    private String userID;
     private String userEmail;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private RecyclerView.Adapter mAdapter;
     private DatabaseReference groupDB;
-    private ArrayList <String> dates = new ArrayList<String>();
+    private ArrayList<String> dates = new ArrayList<>();
     private DataSnapshot event;
     private String groupID;
     private ArrayList<String> participants;
@@ -47,28 +40,27 @@ public class setName extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_name);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         mRef = FirebaseDatabase.getInstance().getReference();
-        userID = firebaseAuth.getCurrentUser().getUid();
-        userEmail = firebaseAuth.getCurrentUser().getEmail();
-        groupsRecyclerView = (RecyclerView) findViewById(R.id.groupsRecyclerView);
-        numParticipants = (TextView) findViewById(R.id.numParticipants);
+        userEmail = Objects.requireNonNull(firebaseAuth.getCurrentUser()).getEmail();
+        RecyclerView groupsRecyclerView = findViewById(R.id.groupsRecyclerView);
+        TextView numParticipants = findViewById(R.id.numParticipants);
         groupsRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         Intent incomingIntent = getIntent();
         participants = incomingIntent.getStringArrayListExtra("checkedMembers");
-        numParticipants.setText("Number of Participants: " + participants.size());
-        ArrayList <String> decodeparticipants = new ArrayList<String>();
-        for(int i=0; i<participants.size(); i++){
+        numParticipants.setText(getString(R.string.number_of_participants, participants.size()));
+        ArrayList<String> decodeparticipants = new ArrayList<>();
+        for (int i = 0; i < participants.size(); i++) {
             decodeparticipants.add(decodeUserEmail(participants.get(i)));
         }
-        mAdapter = new MainAdapter(decodeparticipants);
+        RecyclerView.Adapter mAdapter = new MainAdapter(decodeparticipants);
         groupsRecyclerView.setLayoutManager(mLayoutManager);
         groupsRecyclerView.setAdapter(mAdapter);
-        done = (FloatingActionButton) findViewById(R.id.done);
-        groupName = (EditText) findViewById(R.id.groupName);
+        FloatingActionButton done = findViewById(R.id.done);
+        groupName = findViewById(R.id.groupName);
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,37 +109,37 @@ public class setName extends AppCompatActivity {
         });
     }
 
-    public boolean run(int num) {
+    public void run(int num) {
         for (int i = 0; i < num; i++) {
             mRef.child("Users").child(participants.get(i)).child("Groups").child(groupID).setValue(groupID);
             mRef.child("Users").child(participants.get(i)).child("Events").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    Iterator<DataSnapshot> values = snapshot.getChildren().iterator();
-                    while (values.hasNext()) {
-                        DataSnapshot value = values.next();
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot value : snapshot.getChildren()) {
                         dates.add(value.getKey());
                     }
                     dates = makeUnique(dates);
 
-                    for(int k=0; k<dates.size(); k++){
-                        for(int j=0; j<participants.size();j++){
+                    for (int k = 0; k < dates.size(); k++) {
+                        for (int j = 0; j < participants.size(); j++) {
                             final int finalJ = j;
                             final int finalK = k;
                             mRef.child("Users").child(participants.get(j)).child("Events").child(dates.get(k)).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
-                                public void onDataChange(DataSnapshot snapshot) {
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     if (snapshot.getValue(Event.class) != null) { //event exist in this date
-                                        Iterator<DataSnapshot> events = snapshot.getChildren().iterator();
-                                        while (events.hasNext()) {
-                                            event = events.next();
-                                            mRef.child("Users").child(participants.get(finalJ)).child("Events").child(dates.get(finalK)).child(event.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                            event = dataSnapshot;
+                                            mRef.child("Users").child(participants.get(finalJ)).child("Events").child(dates.get(finalK)).child(Objects.requireNonNull(event.getKey())).addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
-                                                public void onDataChange(DataSnapshot snapshot) {
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                     Event event_ = snapshot.getValue(Event.class);
-                                                    groupDB.child(groupID).child("Events").child(dates.get(finalK)).child(event_.getEventId()).setValue(event_);
-                                                    groupDB.child(groupID).child("Events").child(dates.get(finalK)).child(event_.getEventId()).child("Emails").child(encodeUserEmail(userEmail)).setValue(encodeUserEmail(userEmail));
+                                                    if (event_ != null) {
+                                                        groupDB.child(groupID).child("Events").child(dates.get(finalK)).child(event_.getEventId()).setValue(event_);
+                                                        groupDB.child(groupID).child("Events").child(dates.get(finalK)).child(event_.getEventId()).child("Emails").child(encodeUserEmail(userEmail)).setValue(encodeUserEmail(userEmail));
+                                                    }
                                                 }
+
                                                 @Override
                                                 public void onCancelled(@NonNull DatabaseError databaseError) {
                                                     Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
@@ -156,6 +148,7 @@ public class setName extends AppCompatActivity {
                                         }
                                     }
                                 }
+
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
                                     Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
@@ -166,18 +159,18 @@ public class setName extends AppCompatActivity {
                     groupDB.child(groupID).setValue(group);
                     startActivity(intent);
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Toast.makeText(setName.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         }
-        return true;
     }
 
-    public ArrayList makeUnique(ArrayList<String> list) {
-        ArrayList<String> uniqueList = new ArrayList<String>();
-        for(int i=0; i<list.size(); i++) {
+    public ArrayList<String> makeUnique(ArrayList<String> list) {
+        ArrayList<String> uniqueList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
             if (!uniqueList.contains(list.get(i))) {
                 uniqueList.add(list.get(i));
             }
@@ -188,6 +181,7 @@ public class setName extends AppCompatActivity {
     public String encodeUserEmail(String userEmail) {
         return userEmail.replace(".", ",");
     }
+
     public String decodeUserEmail(String userEmail) {
         return userEmail.replace(",", ".");
     }
