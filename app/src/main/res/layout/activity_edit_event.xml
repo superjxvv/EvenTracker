@@ -13,7 +13,7 @@
         android:layout_height="21dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
+        android:text="@string/the_date"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,11 +25,12 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint="Title"
+        android:hint="@string/title"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/theDate" />
+        app:layout_constraintTop_toBottomOf="@+id/theDate"
+        android:importantForAutofill="no" />
 
     <TextView
         android:id="@+id/start"
@@ -37,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
-        android:text="Start"
+        android:text="@string/start"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/eventName" />
 
@@ -47,7 +48,7 @@
         android:layout_height="20dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
-        android:text="End"
+        android:text="@string/end"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/start" />
 
@@ -58,7 +59,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Start date"
+        android:text="@string/start_date"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/start"
         app:layout_constraintTop_toBottomOf="@+id/eventName" />
@@ -70,7 +71,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="End date"
+        android:text="@string/end_date"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/end"
         app:layout_constraintTop_toBottomOf="@+id/startDate" />
@@ -82,7 +83,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Start time"
+        android:text="@string/start_time"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.392"
         app:layout_constraintStart_toEndOf="@+id/startDate"
@@ -95,7 +96,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="End time"
+        android:text="@string/end_time"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/endDate"
         app:layout_constraintTop_toBottomOf="@+id/startTime" />
@@ -106,7 +107,7 @@
         android:layout_height="52dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
-        android:text="Save"
+        android:text="@string/save"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -119,14 +120,15 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint="remarks"
+        android:hint="@string/remarks"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/checkBoxPrivacy"
-        app:layout_constraintVertical_bias="0.014" />
+        app:layout_constraintVertical_bias="0.014"
+        android:importantForAutofill="no" />
 
     <Button
         android:id="@+id/delete"
@@ -135,7 +137,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
         android:background="@android:color/holo_red_light"
-        android:text="Delete"
+        android:text="@string/delete"
         app:layout_constraintBottom_toTopOf="@+id/save"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -147,7 +149,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Make private"
+        android:text="@string/make_private"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.029"
