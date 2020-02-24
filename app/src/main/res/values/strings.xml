@@ -1,3 +1,37 @@
 <resources>
     <string name="app_name">Eventracker</string>
+    <string name="view_calendar">View Calendar</string>
+    <string name="back_to_events">Back to Events</string>
+    <string name="title">Title</string>
+    <string name="start">Start</string>
+    <string name="end">End</string>
+    <string name="start_date">Start date</string>
+    <string name="end_date">End date</string>
+    <string name="start_time">Start time</string>
+    <string name="end_time">End time</string>
+    <string name="add">Add</string>
+    <string name="remarks">remarks</string>
+    <string name="make_private">Make private</string>
+    <string name="the_date">The Date</string>
+    <string name="new_group">New group</string>
+    <string name="add_participants">Add participants</string>
+    <string name="select_friends_to_be_in_the_group">Select friends to be in the group.</string>
+    <string name="choose_new_admin">Choose new admin</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="add_new_members">Add new members</string>
+    <string name="back_to_group_calendar">Back to group calendar</string>
+    <string name="group_name">GroupName</string>
+    <string name="to">To:</string>
+    <string name="admin">Admin</string>
+    <string name="subject">Subject:</string>
+    <string name="message">Message:</string>
+    <string name="send">send</string>
+    <string name="add_event">Add Event</string>
+    <string name="find_users">Find users</string>
+    <string name="enter_user_email_here">Enter user email here</string>
+    <string name="enter">Enter</string>
+    <string name="user_found">User Found</string>
+    <string name="friends_list">Friends list</string>
+    <string name="click_on_the_username_to_access_their_information">click on the username to access their information</string>
 </resources>

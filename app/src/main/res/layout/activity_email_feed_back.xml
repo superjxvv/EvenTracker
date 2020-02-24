@@ -8,47 +8,53 @@ android:orientation="vertical"
 android:padding="16dp"
 tools:context=".EmailFeedBack">
 
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="To:"
-    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/edit_text_to"
+        android:text="@string/to"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
 <TextView
     android:id="@+id/edit_text_to"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="Admin"/>
+    android:text="@string/admin"/>
 
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="Subject:"
-    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/edit_text_subject"
+        android:text="@string/subject"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
 <EditText
     android:id="@+id/edit_text_subject"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:inputType="textEmailSubject" />
+    android:inputType="textEmailSubject"
+    android:importantForAutofill="no" />
 
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="Message:"
-    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/edit_text_message"
+        android:text="@string/message"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-<EditText
-    android:id="@+id/edit_text_message"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="start|top"
-    android:lines="10" />
+    <EditText
+        android:id="@+id/edit_text_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start|top"
+        android:importantForAutofill="no"
+        android:inputType="textLongMessage|textMultiLine"
+        android:lines="10" />
 
 <Button
     android:id="@+id/button_send"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="send" />
+    android:text="@string/send" />
 
 </LinearLayout>
